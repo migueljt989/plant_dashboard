@@ -1,0 +1,74 @@
+[
+  {
+    "device_id": "device-1",
+    "temperature": 22.5,
+    "soil_moisture": 55.0,
+    "recorded_at": "2025-01-15T08:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 23.1,
+    "soil_moisture": 53.2,
+    "recorded_at": "2025-01-15T09:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 24.8,
+    "soil_moisture": 50.5,
+    "recorded_at": "2025-01-15T12:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 27.3,
+    "soil_moisture": 45.0,
+    "recorded_at": "2025-01-15T15:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 25.0,
+    "soil_moisture": 48.7,
+    "recorded_at": "2025-01-15T18:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 21.0,
+    "soil_moisture": 60.0,
+    "recorded_at": "2025-01-16T08:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 36.5,
+    "soil_moisture": 28.0,
+    "recorded_at": "2025-01-16T14:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 38.2,
+    "soil_moisture": 22.5,
+    "recorded_at": "2025-01-17T13:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 19.5,
+    "soil_moisture": 75.0,
+    "recorded_at": "2025-01-17T20:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 13.0,
+    "soil_moisture": 82.0,
+    "recorded_at": "2025-01-18T06:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 24.0,
+    "soil_moisture": 62.3,
+    "recorded_at": "2025-01-18T10:00:00Z"
+  },
+  {
+    "device_id": "device-1",
+    "temperature": 26.7,
+    "soil_moisture": 57.1,
+    "recorded_at": "2025-01-18T16:00:00Z"
+  }
+]
