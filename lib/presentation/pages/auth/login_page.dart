@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/config/app_theme.dart';
 import '../../../domain/failures/app_failure.dart';
 import '../../providers/auth/auth_providers.dart';
+import '../../router/app_routes.dart';
 
 /// Pantalla de inicio de sesión.
 ///
@@ -39,6 +41,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     await ref
         .read(authControllerProvider.notifier)
         .login(_emailController.text.trim(), _passwordController.text);
+
+    // Navegación explícita al dashboard tras login exitoso.
+    // Esto asegura que la URL del browser se actualice correctamente.
+    if (mounted && ref.read(authControllerProvider).value != null) {
+      context.go(AppRoutes.dashboard);
+    }
   }
 
   @override

@@ -24,6 +24,28 @@ Usar siempre `AsyncValue<T>` para datos async (no banderas manuales de `isLoadin
 - Usar `.autoDispose` por defecto en providers que dependen de una pantalla específica (ej. detalle de un dispositivo), para no acumular streams abiertos sin usar.
 - Providers compartidos por toda la app (auth, tema) sin `.autoDispose`.
 
+## AsyncNotifier + ChangeNotifier (patrón auth)
+
+Cuando un `AsyncNotifier` también implementa `ChangeNotifier` (para que GoRouter lo use como `refreshListenable`):
+
+- Override del setter `state` para llamar `notifyListeners()` en cada cambio explícito (login, logout).
+- Exponer un método público `notifyAuthChanged()` que llame `notifyListeners()`, para que el router pueda invocarlo desde un `ref.listen`. Esto es necesario porque `AsyncNotifier.build()` resuelve sin pasar por el setter override.
+- Nunca llamar `notifyListeners()` directamente desde fuera del controller (es protegido); usar el método público.
+
+```dart
+class AuthController extends AsyncNotifier<AppUser?> with ChangeNotifier {
+  @override
+  set state(AsyncValue<AppUser?> newState) {
+    super.state = newState;
+    notifyListeners();
+  }
+
+  void notifyAuthChanged() {
+    notifyListeners();
+  }
+}
+```
+
 ## Cómo un widget consume datos
 ```dart
 class DashboardPage extends ConsumerWidget {

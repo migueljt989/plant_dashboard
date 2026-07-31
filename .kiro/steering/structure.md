@@ -32,6 +32,7 @@ lib/
     providers/
       <feature>/          # providers de riverpod agrupados por feature
     pages/
+      splash/              # pantalla de carga (restauración de sesión)
       <feature>/           # una carpeta por pantalla/feature
     widgets/                # widgets compartidos entre features
   main.dart

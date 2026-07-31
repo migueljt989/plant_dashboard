@@ -60,6 +60,12 @@ class AuthController extends AsyncNotifier<AppUser?> with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Notifica a los listeners (GoRouter) de un cambio en el estado de auth.
+  /// Necesario porque [build] resuelve sin pasar por el setter override.
+  void notifyAuthChanged() {
+    notifyListeners();
+  }
+
   /// Intenta autenticar con [email] y [password].
   ///
   /// Actualiza el estado a `loading` durante la llamada.
