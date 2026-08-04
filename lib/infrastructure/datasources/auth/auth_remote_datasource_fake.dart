@@ -15,7 +15,7 @@ class AuthRemoteDataSourceFake implements AuthRemoteDataSource {
   @override
   Future<AppUserDto> signIn(String email, String password) async {
     if (email == _fakeEmail && password == _fakePassword) {
-      return const AppUserDto(id: 'fake-user-1', email: _fakeEmail);
+      return const AppUserDto(id: 'fake-user-1', email: _fakeEmail, token: 'fake-token');
     }
     throw const AuthFailure('Credenciales inválidas');
   }

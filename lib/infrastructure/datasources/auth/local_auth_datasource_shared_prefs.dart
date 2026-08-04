@@ -13,6 +13,7 @@ import 'local_auth_datasource.dart';
 class LocalAuthDataSourceSharedPrefs implements LocalAuthDataSource {
   static const _keyUserId = 'auth_user_id';
   static const _keyEmail = 'auth_email';
+  static const _keyToken = 'auth_token';
 
   @override
   Future<String?> readUserId() async {
@@ -30,10 +31,12 @@ class LocalAuthDataSourceSharedPrefs implements LocalAuthDataSource {
   Future<void> saveSession({
     required String userId,
     required String email,
+    required String token
   }) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyUserId, userId);
     await prefs.setString(_keyEmail, email);
+    await prefs.setString(_keyToken, token);
   }
 
   @override

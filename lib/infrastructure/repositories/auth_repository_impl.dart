@@ -20,8 +20,9 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AppUser?> restoreSession() async {
     final userId = await _localStorage.readUserId();
     final email = await _localStorage.readEmail();
-    if (userId != null && email != null) {
-      _currentUser = AppUserDto(id: userId, email: email).toEntity();
+    final token = await _localStorage.readEmail();
+    if (userId != null && email != null && token != null) {
+      _currentUser = AppUserDto(id: userId, email: email, token: token).toEntity();
       _authStateController.add(_currentUser);
       return _currentUser;
     }
@@ -36,6 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
     await _localStorage.saveSession(
       userId: _currentUser!.id,
       email: _currentUser!.email,
+      token: _currentUser!.token
     );
     _authStateController.add(_currentUser);
     return _currentUser!;

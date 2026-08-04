@@ -13,7 +13,7 @@ abstract class LocalAuthDataSource {
   Future<String?> readEmail();
 
   /// Persiste los datos básicos del usuario en storage local.
-  Future<void> saveSession({required String userId, required String email});
+  Future<void> saveSession({required String userId, required String email, required String token});
 
   /// Borra la sesión persistida del storage local.
   Future<void> clearSession();
