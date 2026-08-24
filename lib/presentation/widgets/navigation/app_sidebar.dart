@@ -23,10 +23,11 @@ class AppSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 240,
+    return Material(
       color: AppColors.surface,
-      child: Column(
+      child: SizedBox(
+        width: 240,
+        child: Column(
         children: [
           const _BrandHeader(),
           const Divider(height: 1, color: AppColors.surfaceAlt),
@@ -44,6 +45,7 @@ class AppSidebar extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
