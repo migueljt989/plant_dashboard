@@ -16,4 +16,17 @@ class AppRoutes {
 
   /// Splash de carga mientras se restaura la sesión.
   static const splash = '/';
+
+  // Shell children (authenticated) — secciones del sidebar
+  /// Listado de dispositivos IoT.
+  static const devices = '/dispositivos';
+
+  /// Listado de sensores.
+  static const sensors = '/sensores';
+
+  /// Histórico de lecturas.
+  static const readings = '/lecturas';
+
+  /// Alertas del sistema.
+  static const alerts = '/alertas';
 }

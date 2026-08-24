@@ -6,14 +6,14 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
 
 ## Tasks
 
-- [ ] 1. Update AppRoutes and create NavItem model
-  - [ ] 1.1 Add new route constants to AppRoutes
+- [x] 1. Update AppRoutes and create NavItem model
+  - [x] 1.1 Add new route constants to AppRoutes
     - Add `devices`, `sensors`, `readings`, and `alerts` constants to `lib/presentation/router/app_routes.dart`
     - Values: `/dispositivos`, `/sensores`, `/lecturas`, `/alertas`
     - Keep existing constants (`splash`, `login`, `register`, `dashboard`) unchanged
     - _Requirements: 8.1_
 
-  - [ ] 1.2 Create NavItem model and kNavItems list
+  - [x] 1.2 Create NavItem model and kNavItems list
     - Create `lib/presentation/widgets/navigation/nav_item.dart`
     - Define `NavItem` class with `label`, `icon`, and `route` fields
     - Define `kNavItems` const list with 5 items in order: Dashboard, Dispositivos, Sensores, Lecturas, Alertas
@@ -21,7 +21,7 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
     - _Requirements: 2.1, 2.2_
 
 - [ ] 2. Create AppSidebar widget
-  - [ ] 2.1 Implement AppSidebar with nav items and active highlighting
+  - [~] 2.1 Implement AppSidebar with nav items and active highlighting
     - Create `lib/presentation/widgets/navigation/app_sidebar.dart`
     - Accepts `currentRoute` (String) and `onItemTap` (callback) parameters
     - Fixed width of 240px, background `AppColors.surface`
@@ -34,7 +34,7 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.3, 7.1_
 
 - [ ] 3. Create NavigationShell widget
-  - [ ] 3.1 Implement responsive NavigationShell with desktop and mobile layouts
+  - [~] 3.1 Implement responsive NavigationShell with desktop and mobile layouts
     - Create `lib/presentation/widgets/navigation/navigation_shell.dart`
     - `ConsumerWidget` that receives `child` from ShellRoute
     - Gets current location from `GoRouterState.of(context).uri.path`
@@ -45,11 +45,11 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
     - Logout calls `ref.read(logoutProvider)()`
     - _Requirements: 1.1, 1.2, 3.2, 4.1, 5.1, 5.2, 5.3, 6.1, 6.2, 6.3, 6.4, 7.2, 7.3_
 
-- [ ] 4. Checkpoint - Verify sidebar widgets compile
+- [~] 4. Checkpoint - Verify sidebar widgets compile
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 5. Rewrite app_router.dart with ShellRoute
-  - [ ] 5.1 Update app_router.dart to use ShellRoute wrapping authenticated routes
+  - [~] 5.1 Update app_router.dart to use ShellRoute wrapping authenticated routes
     - Keep `splash`, `login`, `register` as top-level GoRoute entries outside the shell
     - Add a `ShellRoute` with `builder` that returns `NavigationShell(child: child)`
     - Shell children: `/dashboard`, `/dispositivos`, `/sensores`, `/lecturas`, `/alertas`
@@ -60,14 +60,14 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
     - _Requirements: 1.1, 1.3, 1.4, 4.1, 4.2, 4.3, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
 - [ ] 6. Refactor DashboardPage and create placeholder pages
-  - [ ] 6.1 Refactor DashboardPage to remove Scaffold and AppBar
+  - [~] 6.1 Refactor DashboardPage to remove Scaffold and AppBar
     - Remove the `Scaffold` wrapper and its `appBar` from `DashboardPage.build()`
     - Remove the logout `IconButton` from dashboard (it now lives in NavigationShell)
     - The widget should directly return the `readingAsync.when(...)` content (loading/error/data)
     - Keep all existing body content (`_DashboardBody`, `_HistorySection`, `_ErrorBanner`, etc.) unchanged
     - _Requirements: 1.2_
 
-  - [ ] 6.2 Create placeholder pages for Dispositivos, Sensores, Lecturas, Alertas
+  - [~] 6.2 Create placeholder pages for Dispositivos, Sensores, Lecturas, Alertas
     - Create `lib/presentation/pages/devices/devices_page.dart` with `DevicesPage` StatelessWidget
     - Create `lib/presentation/pages/sensors/sensors_page.dart` with `SensorsPage` StatelessWidget
     - Create `lib/presentation/pages/readings/readings_page.dart` with `ReadingsPage` StatelessWidget
@@ -75,7 +75,7 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
     - Each shows a centered text: "[Section name] — próximamente"
     - _Requirements: 8.1, 8.3, 8.4, 8.5, 8.6_
 
-- [ ] 7. Final checkpoint - Ensure all components are wired together
+- [~] 7. Final checkpoint - Ensure all components are wired together
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
