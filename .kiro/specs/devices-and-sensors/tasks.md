@@ -66,17 +66,17 @@ Implement full device and sensor management following Clean Architecture: domain
     - Implement `Sensor toEntity()` that converts metric string via `MetricType.fromString()` and parses `createdAt`
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 3. Checkpoint - Domain and DTO validation
+- [x] 3. Checkpoint - Domain and DTO validation
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Create datasource contracts and backend implementations
-  - [ ] 4.1 Create DeviceRemoteDataSource contract
+- [x] 4. Create datasource contracts and backend implementations
+  - [x] 4.1 Create DeviceRemoteDataSource contract
     - Create `lib/infrastructure/datasources/device/device_remote_datasource.dart`
     - Import DeviceDto
     - Define `abstract class DeviceRemoteDataSource` with methods: `Future<List<DeviceDto>> fetchAll()`, `Future<Map<String, dynamic>> register(String name, String type)`, `Future<DeviceDto> revoke(String deviceId)`
     - _Requirements: 7.1, 7.2, 7.3_
 
-  - [ ] 4.2 Create DeviceRemoteDataSourceBackend implementation
+  - [x] 4.2 Create DeviceRemoteDataSourceBackend implementation
     - Create `lib/infrastructure/datasources/device/device_remote_datasource_backend.dart`
     - Import Dio, AppFailure types, DeviceDto, and the contract
     - Constructor receives `Dio` instance
@@ -85,13 +85,13 @@ Implement full device and sensor management following Clean Architecture: domain
     - `revoke()`: PATCH `/devices/{deviceId}/revoke`, parse response into DeviceDto, handle 404 → NotFoundFailure
     - _Requirements: 7.4, 7.5, 7.6, 7.7, 16.1, 16.3_
 
-  - [ ] 4.3 Create SensorRemoteManagementDataSource contract
+  - [x] 4.3 Create SensorRemoteManagementDataSource contract
     - Create `lib/infrastructure/datasources/sensor/sensor_remote_management_datasource.dart`
     - Import SensorDto
     - Define `abstract class SensorRemoteManagementDataSource` with methods: `Future<List<SensorDto>> fetchAll()`, `Future<List<SensorDto>> fetchByDevice(String deviceId)`, `Future<SensorDto> create({required String deviceId, required String name, required String metric, double? minOk, double? maxOk})`, `Future<SensorDto> update(String sensorId, Map<String, dynamic> fields)`
     - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
-  - [ ] 4.4 Create SensorRemoteManagementDataSourceBackend implementation
+  - [x] 4.4 Create SensorRemoteManagementDataSourceBackend implementation
     - Create `lib/infrastructure/datasources/sensor/sensor_remote_management_datasource_backend.dart`
     - Import Dio, AppFailure types, SensorDto, and the contract
     - Constructor receives `Dio` instance
@@ -102,7 +102,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - _Requirements: 8.5, 8.6, 8.7, 8.8, 8.9, 8.10, 16.1, 16.2, 16.3_
 
 - [ ] 5. Create repository implementations
-  - [ ] 5.1 Create DeviceRepositoryImpl
+  - [~] 5.1 Create DeviceRepositoryImpl
     - Create `lib/infrastructure/repositories/device_repository_impl.dart`
     - Import DeviceRepository contract, DeviceRemoteDataSource, Device entity, DeviceType, DeviceDto
     - Constructor receives `DeviceRemoteDataSource`
@@ -111,7 +111,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - `revoke()`: delegates to datasource `revoke()`, maps DTO via `toEntity()`
     - _Requirements: 9.1_
 
-  - [ ] 5.2 Create SensorManagementRepositoryImpl
+  - [~] 5.2 Create SensorManagementRepositoryImpl
     - Create `lib/infrastructure/repositories/sensor_management_repository_impl.dart`
     - Import SensorManagementRepository contract, SensorRemoteManagementDataSource, Sensor entity, MetricType
     - Constructor receives `SensorRemoteManagementDataSource`
@@ -121,11 +121,11 @@ Implement full device and sensor management following Clean Architecture: domain
     - `update()`: builds fields map from non-null parameters, delegates to datasource `update()`, maps DTO
     - _Requirements: 9.2_
 
-- [ ] 6. Checkpoint - Infrastructure layer validation
+- [~] 6. Checkpoint - Infrastructure layer validation
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. Create Riverpod provider wiring
-  - [ ] 7.1 Create device providers
+  - [~] 7.1 Create device providers
     - Create `lib/presentation/providers/device/device_providers.dart`
     - Import Riverpod, domain entities/repos, infrastructure datasource + backend impl, `authenticatedDioProvider`, repository impl
     - Define `deviceDataSourceProvider`: Provider that creates `DeviceRemoteDataSourceBackend` using `ref.watch(authenticatedDioProvider)`
@@ -134,7 +134,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - Implement `DevicesController extends AsyncNotifier<List<Device>>` with `build()` that calls `getAll()`, `registerDevice(name, type)` that calls register + `ref.invalidateSelf()` + returns DeviceRegistration, `revokeDevice(deviceId)` that calls revoke + `ref.invalidateSelf()`
     - _Requirements: 9.3, 9.5_
 
-  - [ ] 7.2 Create sensor management providers
+  - [~] 7.2 Create sensor management providers
     - Create `lib/presentation/providers/sensor/sensor_management_providers.dart`
     - Import Riverpod, domain entities/repos, infrastructure datasource + backend impl, `authenticatedDioProvider`, repository impl
     - Define `sensorManagementDataSourceProvider`: Provider that creates `SensorRemoteManagementDataSourceBackend` using `ref.watch(authenticatedDioProvider)`
@@ -144,7 +144,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - _Requirements: 9.4, 9.5_
 
 - [ ] 8. Implement Devices Page UI
-  - [ ] 8.1 Rewrite DevicesPage with full device management
+  - [~] 8.1 Rewrite DevicesPage with full device management
     - Rewrite `lib/presentation/pages/devices/devices_page.dart` replacing the placeholder
     - Use `ConsumerWidget` watching `devicesControllerProvider`
     - Render device list using `AsyncValue.when()` for loading/error/data states
@@ -161,7 +161,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 12.1, 12.2, 12.3, 12.4, 12.5, 16.4_
 
 - [ ] 9. Implement Sensors Page UI
-  - [ ] 9.1 Rewrite SensorsPage with full sensor management
+  - [~] 9.1 Rewrite SensorsPage with full sensor management
     - Rewrite `lib/presentation/pages/sensors/sensors_page.dart` replacing the placeholder
     - Use `ConsumerWidget` watching both `sensorsControllerProvider` and `devicesControllerProvider`
     - Map `deviceId → device.name` from the devices list for display
@@ -178,7 +178,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - Show SnackBar on operation failure
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 14.1, 14.2, 14.3, 14.4, 14.5, 15.1, 15.2, 15.3, 15.4, 15.5, 16.4_
 
-- [ ] 10. Final checkpoint - Full feature validation
+- [~] 10. Final checkpoint - Full feature validation
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
