@@ -33,8 +33,8 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
     - No logout action in the sidebar — only nav items and brand
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.3, 7.1_
 
-- [ ] 3. Create NavigationShell widget
-  - [~] 3.1 Implement responsive NavigationShell with desktop and mobile layouts
+- [x] 3. Create NavigationShell widget
+  - [x] 3.1 Implement responsive NavigationShell with desktop and mobile layouts
     - Create `lib/presentation/widgets/navigation/navigation_shell.dart`
     - `ConsumerWidget` that receives `child` from ShellRoute
     - Gets current location from `GoRouterState.of(context).uri.path`
