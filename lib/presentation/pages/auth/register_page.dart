@@ -15,21 +15,23 @@ import '../../router/app_routes.dart';
 ///
 /// El redirect al dashboard lo ejecuta el guard de GoRouter (app_router.dart)
 /// en cuanto [authControllerProvider] expone un [AppUser] no nulo.
-class LoginPage extends ConsumerStatefulWidget {
-  const LoginPage({super.key});
+class RegisterPage extends ConsumerStatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  ConsumerState<LoginPage> createState() => _LoginPageState();
+  ConsumerState<RegisterPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends ConsumerState<LoginPage> {
+class _LoginPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -40,17 +42,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     await ref
         .read(authControllerProvider.notifier)
-        .login(_emailController.text.trim(), _passwordController.text);
+        .register(_nameController.text.trim(),_emailController.text.trim(), _passwordController.text);
 
     // Navegación explícita al dashboard tras login exitoso.
     // Esto asegura que la URL del browser se actualice correctamente.
     if (mounted && ref.read(authControllerProvider).value != null) {
       context.go(AppRoutes.dashboard);
     }
-  }
-
-  void _register() {
-    context.go(AppRoutes.register);
   }
 
   @override
@@ -98,6 +96,34 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     const SizedBox(height: 16),
                   ],
+                  Text(
+                    'Registro',
+                    textAlign: TextAlign.start,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.normal,
+                        ),
+                  ),
+                  SizedBox(height: 18,),
+
+                  // ── Nombre ────────────────────────────────────
+                  TextFormField(
+                    controller: _nameController,
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next,
+                    enabled: !isLoading,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre',
+                      prefixIcon: Icon(Icons.person_2_outlined),
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Ingresa tu nombre';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
 
                   // ── Campo de correo ────────────────────────────────────
                   TextFormField(
@@ -155,24 +181,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // ── Botón de login ─────────────────────────────────────
+                  // ── Botón de registro ─────────────────────────────────────
                   FilledButton(
-                    onPressed: isLoading ? null : _submit,
-                    child: isLoading
-                        ? SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
-                          )
-                        : const Text('Iniciar sesión'),
-                  ),
-                  SizedBox(height: 10),
-                  // ── Botón de signi-in ─────────────────────────────────────
-                  FilledButton(
-                    onPressed: _register,
+                    onPressed: _submit,
                     child: isLoading
                         ? SizedBox(
                             height: 20,
@@ -184,7 +195,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           )
                         : const Text('Registrarse'),
                   ),
-                  
                 ],
               ),
             ),

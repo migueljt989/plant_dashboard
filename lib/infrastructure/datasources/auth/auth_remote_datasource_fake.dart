@@ -22,4 +22,10 @@ class AuthRemoteDataSourceFake implements AuthRemoteDataSource {
 
   @override
   Future<void> signOut() async {}
+
+  @override
+  Future<AppUserDto> register(String name, String email, String password) {
+    // TODO: implement register
+    throw UnimplementedError();
+  }
 }

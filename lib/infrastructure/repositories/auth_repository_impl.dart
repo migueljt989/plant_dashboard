@@ -20,7 +20,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<AppUser?> restoreSession() async {
     final userId = await _localStorage.readUserId();
     final email = await _localStorage.readEmail();
-    final token = await _localStorage.readEmail();
+    final token = await _localStorage.readToken();
     if (userId != null && email != null && token != null) {
       _currentUser = AppUserDto(id: userId, email: email, token: token).toEntity();
       _authStateController.add(_currentUser);
@@ -44,6 +44,19 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<AppUser> register(String name, String email, String password) async {
+    final dto = await _dataSource.register(name, email, password);
+    _currentUser = dto.toEntity();
+    await _localStorage.saveSession(
+      userId: _currentUser!.id,
+      email: _currentUser!.email,
+      token: _currentUser!.token
+    );
+    _authStateController.add(_currentUser);
+    return _currentUser!;
+  }
+
+  @override
   Future<void> logout() async {
     await _dataSource.signOut();
     // Borrar la sesión persistida.
@@ -57,4 +70,5 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Stream<AppUser?> get authStateChanges => _authStateController.stream;
+  
 }

@@ -32,18 +32,30 @@ import '../../models/app_user_dto.dart';
     print(st);
     rethrow;
     }
-    
+  }
 
+  @override
+  Future<AppUserDto> register(String name, String email, String password) async {
 
+    try {
+      final response = await dio.post('/auth/register', data: {
+        'email': email,
+        'password': password
+      });
 
-    
+      if (response.statusCode == 201){
+        return await signIn(email, password);
+      }
+      throw Exception('Registro fallido: ${response.statusCode}');
+    } catch (e) {
+      throw Exception('Fallo: $e');
+    }
+
   }
  
   @override
-  Future<void> signOut() {
-    // TODO: implement signOut
-    throw UnimplementedError();
-  }
+  Future<void> signOut() async {}
+
 
 
  

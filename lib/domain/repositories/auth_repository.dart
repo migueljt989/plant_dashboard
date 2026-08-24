@@ -4,6 +4,8 @@ abstract class AuthRepository {
   /// Intenta autenticar. Lanza [AuthFailure] si falla.
   Future<AppUser> login(String email, String password);
 
+  Future<AppUser> register (String name, String email, String password);
+
   /// Cierra la sesión actual.
   Future<void> logout();
 

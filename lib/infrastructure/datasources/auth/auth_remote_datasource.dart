@@ -7,6 +7,8 @@ abstract class AuthRemoteDataSource {
   /// Lanza [AuthFailure] si las credenciales son inválidas.
   Future<AppUserDto> signIn(String email, String password);
 
+  Future<AppUserDto> register (String name, String email, String password);
+
   /// Cierra la sesión actual.
   Future<void> signOut();
 }

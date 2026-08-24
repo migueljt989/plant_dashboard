@@ -78,6 +78,13 @@ class AuthController extends AsyncNotifier<AppUser?> with ChangeNotifier {
     );
   }
 
+  Future<void> register(String name, String email, String password) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      () => ref.read(authRepositoryProvider).register(name,email, password),
+    );
+  }
+
   /// Cierra la sesión y vuelve al estado `data(null)`.
   Future<void> logout() async {
     state = const AsyncValue.loading();

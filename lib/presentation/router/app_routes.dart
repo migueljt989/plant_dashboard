@@ -8,6 +8,9 @@ class AppRoutes {
   /// Pantalla de inicio de sesión.
   static const login = '/login';
 
+    /// Pantalla de registro.
+  static const register = '/register';
+
   /// Dashboard principal (ruta protegida por el guard de auth).
   static const dashboard = '/dashboard';
 

@@ -27,6 +27,12 @@ class LocalAuthDataSourceSharedPrefs implements LocalAuthDataSource {
     return prefs.getString(_keyEmail);
   }
 
+   @override
+  Future<String?> readToken() async{
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyToken);
+  }
+
   @override
   Future<void> saveSession({
     required String userId,
@@ -44,5 +50,8 @@ class LocalAuthDataSourceSharedPrefs implements LocalAuthDataSource {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyUserId);
     await prefs.remove(_keyEmail);
+    await prefs.remove(_keyToken);
   }
+
+
 }

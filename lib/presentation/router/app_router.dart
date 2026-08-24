@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:plant_dashboard/presentation/pages/auth/register_page.dart';
 
 import '../pages/auth/login_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
@@ -54,8 +55,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         return null;
       }
 
-      // No autenticado: si no está en login → forzar login.
-      if (!goingToLogin) return AppRoutes.login;
+      // No autenticado: si no está en login o register → forzar login.
+      if (!goingToLogin && location != AppRoutes.register) return AppRoutes.login;
       return null;
     },
     routes: [
@@ -66,6 +67,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.register,
+        builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
         path: AppRoutes.dashboard,
