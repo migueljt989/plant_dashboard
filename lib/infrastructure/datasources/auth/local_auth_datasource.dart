@@ -12,10 +12,26 @@ abstract class LocalAuthDataSource {
   /// Devuelve `null` si no hay sesión persistida.
   Future<String?> readEmail();
 
+  /// Lee el access token guardado en storage local.
+  /// Devuelve `null` si no hay sesión persistida.
   Future<String?> readToken();
 
-  /// Persiste los datos básicos del usuario en storage local.
-  Future<void> saveSession({required String userId, required String email, required String token});
+  /// Lee el refresh token guardado en storage local.
+  /// Devuelve `null` si no hay sesión persistida.
+  Future<String?> readRefreshToken();
+
+  /// Persiste los datos de sesión del usuario en storage local,
+  /// incluyendo ambos tokens (access y refresh).
+  Future<void> saveSession({
+    required String userId,
+    required String email,
+    required String token,
+    required String refreshToken,
+  });
+
+  /// Actualiza únicamente el access token en storage local.
+  /// Usado por el interceptor tras un refresh exitoso.
+  Future<void> updateAccessToken(String token);
 
   /// Borra la sesión persistida del storage local.
   Future<void> clearSession();

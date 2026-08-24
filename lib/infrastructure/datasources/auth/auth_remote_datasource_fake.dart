@@ -1,5 +1,5 @@
 import '../../../domain/failures/app_failure.dart';
-import '../../models/app_user_dto.dart';
+import '../../models/token_pair_dto.dart';
 import 'auth_remote_datasource.dart';
 
 /// Implementación fake del [AuthRemoteDataSource].
@@ -13,19 +13,36 @@ class AuthRemoteDataSourceFake implements AuthRemoteDataSource {
   const AuthRemoteDataSourceFake();
 
   @override
-  Future<AppUserDto> signIn(String email, String password) async {
+  Future<TokenPairDto> signIn(String email, String password) async {
     if (email == _fakeEmail && password == _fakePassword) {
-      return const AppUserDto(id: 'fake-user-1', email: _fakeEmail, token: 'fake-token');
+      return TokenPairDto(
+        userId: 'fake-user-1',
+        email: email,
+        accessToken: 'fake-access-token',
+        refreshToken: 'fake-refresh-token',
+      );
     }
-    throw const AuthFailure('Credenciales inválidas');
+    throw const InvalidCredentialsFailure();
+  }
+
+  @override
+  Future<TokenPairDto> register(String email, String password) async {
+    if (email == _fakeEmail) {
+      throw const EmailAlreadyExistsFailure();
+    }
+    return TokenPairDto(
+      userId: 'fake-user-${email.hashCode}',
+      email: email,
+      accessToken: 'fake-access-token',
+      refreshToken: 'fake-refresh-token',
+    );
+  }
+
+  @override
+  Future<String> refreshToken(String refreshToken) async {
+    return 'fake-refreshed-token';
   }
 
   @override
   Future<void> signOut() async {}
-
-  @override
-  Future<AppUserDto> register(String name, String email, String password) {
-    // TODO: implement register
-    throw UnimplementedError();
-  }
 }

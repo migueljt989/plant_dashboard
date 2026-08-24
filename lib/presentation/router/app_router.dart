@@ -1,62 +1,61 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:plant_dashboard/presentation/pages/auth/register_page.dart';
 
 import '../pages/auth/login_page.dart';
+import '../pages/auth/register_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
 import '../pages/splash/splash_page.dart';
 import '../providers/auth/auth_providers.dart';
 import 'app_routes.dart';
 
 /// Provee el [GoRouter] configurado con:
-/// - Guard de autenticación en `redirect`.
-/// - `refreshListenable` apuntando al notifier de auth para que el router
-///   re-evalúe el guard cada vez que la sesión cambia.
+/// - Guard de autenticación basado en [authSessionProvider].
+/// - `refreshListenable` apuntando al [AuthSessionNotifier] para que el router
+///   re-evalúe el guard solo cuando la sesión cambia (login/logout).
 ///
-/// Reglas del guard:
-/// 1. Usuario no autenticado que intenta ir a una ruta protegida → `/login`.
-/// 2. Usuario autenticado que va a `/login` → `/` (dashboard).
-/// 3. Cualquier otro caso → sin redirección.
+/// El router NUNCA se entera de errores de formulario — esos viven en
+/// [loginControllerProvider] y [registerControllerProvider] que son autoDispose.
 final routerProvider = Provider<GoRouter>((ref) {
-  // Obtenemos el notifier (AuthController) para usarlo como refreshListenable.
-  // AuthController extiende ChangeNotifier, por lo que GoRouter escucha sus
-  // notificaciones y re-evalúa redirect automáticamente.
-  final authNotifier = ref.watch(authControllerProvider.notifier);
+  final sessionNotifier = ref.watch(authSessionProvider.notifier);
 
-  // Escuchamos el estado de auth para que cuando build() resuelva
-  // (restoreSession termina), se llame notifyListeners() y GoRouter
-  // re-evalúe el redirect. Esto es necesario porque AsyncNotifier.build()
-  // no pasa por el setter override al resolver.
-  ref.listen(authControllerProvider, (prev, next) {
-    authNotifier.notifyAuthChanged();
+  // Forzar la activación de restoreSessionProvider (lee tokens de localStorage).
+  // Esto garantiza que la restauración se dispare sin importar la ruta inicial.
+  ref.read(restoreSessionProvider);
+
+  // Cuando restoreSession termine, volcar el usuario a authSessionProvider.
+  // setUser → notifyListeners → GoRouter re-evalúa redirect.
+  ref.listen(restoreSessionProvider, (prev, next) {
+    next.whenData((user) {
+      if (user != null) {
+        ref.read(authSessionProvider.notifier).setUser(user);
+      }
+    });
   });
 
   return GoRouter(
-    refreshListenable: authNotifier,
+    initialLocation: AppRoutes.splash,
+    refreshListenable: sessionNotifier,
     redirect: (context, state) {
-      final authState = ref.read(authControllerProvider);
+      final user = ref.read(authSessionProvider);
       final location = state.matchedLocation;
       final goingToLogin = location == AppRoutes.login;
+      final goingToRegister = location == AppRoutes.register;
       final goingToSplash = location == AppRoutes.splash;
 
-      // Mientras el estado está en loading (restaurando sesión), mandamos
-      // al splash para mostrar un spinner neutral, no el formulario de login.
-      if (authState.isLoading) {
-        return goingToSplash ? null : AppRoutes.splash;
-      }
+      final isLoggedIn = user != null;
 
-      final isLoggedIn = authState.value != null;
-
-      // Ya no necesitamos el splash una vez resuelto el estado.
-      // Redirigir según sesión.
       if (isLoggedIn) {
-        // Autenticado: si está en login o splash → dashboard.
-        if (goingToLogin || goingToSplash) return AppRoutes.dashboard;
+        // Autenticado: si está en login, register o splash → dashboard.
+        if (goingToLogin || goingToRegister || goingToSplash) {
+          return AppRoutes.dashboard;
+        }
         return null;
       }
 
-      // No autenticado: si no está en login o register → forzar login.
-      if (!goingToLogin && location != AppRoutes.register) return AppRoutes.login;
+      // No autenticado: permitir login, register, y splash. Bloquear el resto.
+      if (!goingToLogin && !goingToRegister && !goingToSplash) {
+        return AppRoutes.login;
+      }
       return null;
     },
     routes: [

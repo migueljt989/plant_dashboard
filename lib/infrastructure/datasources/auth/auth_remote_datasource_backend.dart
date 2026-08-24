@@ -1,62 +1,98 @@
 import 'package:dio/dio.dart';
-import 'package:plant_dashboard/infrastructure/datasources/auth/auth_remote_datasource.dart';
 
-import '../../models/app_user_dto.dart';
+import '../../../core/utils/jwt_utils.dart';
+import '../../../domain/failures/app_failure.dart';
+import '../../models/token_pair_dto.dart';
+import 'auth_remote_datasource.dart';
 
-/// Contrato abstracto del DataSource de autenticación.
-/// Las implementaciones concretas (Fake, Firebase, Cognito, etc.) deben extender esta clase.
- class AuthRemoteDataSourceBackend implements AuthRemoteDataSource{
+/// Implementación concreta del datasource de autenticación contra el backend FastAPI.
+class AuthRemoteDataSourceBackend implements AuthRemoteDataSource {
+  final Dio _dio;
 
-  final dio = Dio(BaseOptions(
-      baseUrl: "http://127.0.0.1:8000"
-      ));
-
-
-
-  AuthRemoteDataSourceBackend();
-  
-  @override
-  Future<AppUserDto> signIn(String email, String password) async{
-
-    try {
-      print('antes del post');
-      final response = await dio.post('/auth/login', data: {
-      'email': email,
-      'password': password
-    });
-    final String token = response.data['access_token'] as String;
-    print('respuesta: ${response.data}');
-    return AppUserDto(id: 'fake-id', email: email, token: token);
-    } catch (e, st) {
-      print('error login: $e');
-    print(st);
-    rethrow;
-    }
-  }
+  AuthRemoteDataSourceBackend(this._dio);
 
   @override
-  Future<AppUserDto> register(String name, String email, String password) async {
-
+  Future<TokenPairDto> signIn(String email, String password) async {
     try {
-      final response = await dio.post('/auth/register', data: {
+      final response = await _dio.post('/auth/login', data: {
         'email': email,
-        'password': password
+        'password': password,
       });
 
-      if (response.statusCode == 201){
-        return await signIn(email, password);
+      final accessToken = response.data['access_token'] as String;
+      final refreshToken = response.data['refresh_token'] as String;
+      final payload = decodeJwtPayload(accessToken);
+      final userId = payload['sub'] as String;
+
+      return TokenPairDto(
+        userId: userId,
+        email: email,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const InvalidCredentialsFailure();
       }
-      throw Exception('Registro fallido: ${response.statusCode}');
-    } catch (e) {
-      throw Exception('Fallo: $e');
+      throw NetworkFailure(e.message ?? 'Error de red');
     }
-
   }
- 
+
   @override
-  Future<void> signOut() async {}
+  Future<TokenPairDto> register(String email, String password) async {
+    try {
+      final regResponse = await _dio.post('/auth/register', data: {
+        'email': email,
+        'password': password,
+      });
 
+      final userId = regResponse.data['id'] as String;
 
+      // Auto-login to get tokens
+      final loginResponse = await _dio.post('/auth/login', data: {
+        'email': email,
+        'password': password,
+      });
 
- 
+      final accessToken = loginResponse.data['access_token'] as String;
+      final refreshToken = loginResponse.data['refresh_token'] as String;
+
+      return TokenPairDto(
+        userId: userId,
+        email: email,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      );
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 409) {
+        throw const EmailAlreadyExistsFailure();
+      }
+      if (e.response?.statusCode == 422) {
+        final detail = e.response?.data?['detail'];
+        final msg = detail is List ? detail.first['msg'] as String : '$detail';
+        throw ValidationFailure(msg);
+      }
+      throw NetworkFailure(e.message ?? 'Error de red');
+    }
+  }
+
+  @override
+  Future<String> refreshToken(String refreshToken) async {
+    try {
+      final response = await _dio.post('/auth/refresh', data: {
+        'refresh_token': refreshToken,
+      });
+      return response.data['access_token'] as String;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw const SessionExpiredFailure();
+      }
+      throw NetworkFailure(e.message ?? 'Error de red');
+    }
+  }
+
+  @override
+  Future<void> signOut() async {
+    // Backend has no explicit logout endpoint — session cleanup is handled locally.
+  }
 }

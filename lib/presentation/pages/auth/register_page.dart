@@ -7,31 +7,25 @@ import '../../../domain/failures/app_failure.dart';
 import '../../providers/auth/auth_providers.dart';
 import '../../router/app_routes.dart';
 
-/// Pantalla de inicio de sesión.
+/// Pantalla de registro.
 ///
-/// Requisito 1.2: credenciales válidas → autentica y redirige al dashboard.
-/// Requisito 1.3: credenciales inválidas → muestra mensaje genérico sin
-///   revelar si el problema fue el usuario o la contraseña.
-///
-/// El redirect al dashboard lo ejecuta el guard de GoRouter (app_router.dart)
-/// en cuanto [authControllerProvider] expone un [AppUser] no nulo.
+/// Usa [registerControllerProvider] (autoDispose) para manejar loading/error
+/// del formulario. Al salir de la página el estado se limpia automáticamente.
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  ConsumerState<RegisterPage> createState() => _LoginPageState();
+  ConsumerState<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends ConsumerState<RegisterPage> {
+class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -40,25 +34,25 @@ class _LoginPageState extends ConsumerState<RegisterPage> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    await ref
-        .read(authControllerProvider.notifier)
-        .register(_nameController.text.trim(),_emailController.text.trim(), _passwordController.text);
+    final success = await ref
+        .read(registerControllerProvider.notifier)
+        .register(_emailController.text.trim(), _passwordController.text);
 
-    // Navegación explícita al dashboard tras login exitoso.
-    // Esto asegura que la URL del browser se actualice correctamente.
-    if (mounted && ref.read(authControllerProvider).value != null) {
+    // Navegación explícita al dashboard tras registro exitoso.
+    if (mounted && success) {
       context.go(AppRoutes.dashboard);
     }
   }
 
+  void _goToLogin() {
+    context.go(AppRoutes.login);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authControllerProvider);
-    final isLoading = authState.isLoading;
-
-    // Extraemos el error si existe y es un AuthFailure (o cualquier otra excepción).
-    // La UI siempre muestra el mismo mensaje genérico (Requisito 1.3).
-    final hasError = authState.hasError;
+    final formState = ref.watch(registerControllerProvider);
+    final isLoading = formState.isLoading;
+    final hasError = formState.hasError;
 
     return Scaffold(
       body: Center(
@@ -73,11 +67,7 @@ class _LoginPageState extends ConsumerState<RegisterPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // ── Logo / título ──────────────────────────────────────
-                  const Icon(
-                    Icons.eco,
-                    size: 64,
-                    color: AppColors.primary,
-                  ),
+                  const Icon(Icons.eco, size: 64, color: AppColors.primary),
                   const SizedBox(height: 12),
                   Text(
                     'Panel de Monitoreo',
@@ -88,14 +78,14 @@ class _LoginPageState extends ConsumerState<RegisterPage> {
                   ),
                   const SizedBox(height: 32),
 
-                  // ── Mensaje de error genérico (Requisito 1.3) ──────────
+                  // ── Banner de error ────────────────────────────────────
                   if (hasError) ...[
                     _ErrorBanner(
-                      // Nunca revelar si el fallo fue usuario o contraseña.
-                      message: _resolveErrorMessage(authState.error),
+                      message: _resolveErrorMessage(formState.error),
                     ),
                     const SizedBox(height: 16),
                   ],
+
                   Text(
                     'Registro',
                     textAlign: TextAlign.start,
@@ -103,27 +93,7 @@ class _LoginPageState extends ConsumerState<RegisterPage> {
                           fontWeight: FontWeight.normal,
                         ),
                   ),
-                  SizedBox(height: 18,),
-
-                  // ── Nombre ────────────────────────────────────
-                  TextFormField(
-                    controller: _nameController,
-                    keyboardType: TextInputType.name,
-                    textInputAction: TextInputAction.next,
-                    enabled: !isLoading,
-                    decoration: const InputDecoration(
-                      labelText: 'Nombre',
-                      prefixIcon: Icon(Icons.person_2_outlined),
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Ingresa tu nombre';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 18),
 
                   // ── Campo de correo ────────────────────────────────────
                   TextFormField(
@@ -181,19 +151,23 @@ class _LoginPageState extends ConsumerState<RegisterPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // ── Botón de registro ─────────────────────────────────────
+                  // ── Botón de registro ──────────────────────────────────
                   FilledButton(
-                    onPressed: _submit,
+                    onPressed: isLoading ? null : _submit,
                     child: isLoading
-                        ? SizedBox(
+                        ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Text('Registrarse'),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ── Link a login ───────────────────────────────────────
+                  TextButton(
+                    onPressed: isLoading ? null : _goToLogin,
+                    child: const Text('¿Ya tienes cuenta? Inicia sesión'),
                   ),
                 ],
               ),
@@ -204,19 +178,15 @@ class _LoginPageState extends ConsumerState<RegisterPage> {
     );
   }
 
-  /// Devuelve siempre el mismo mensaje genérico para no revelar
-  /// si el problema fue el usuario o la contraseña (Requisito 1.3).
   String _resolveErrorMessage(Object? error) {
-    if (error is AuthFailure) {
-      return 'Credenciales incorrectas';
+    if (error is AppFailure) {
+      return error.message;
     }
-    // Para cualquier otro error (red, inesperado) también usamos un mensaje
-    // genérico que no expone detalles internos.
-    return 'Credenciales incorrectas';
+    return 'Ocurrió un error inesperado';
   }
 }
 
-/// Banner de error compacto que se muestra bajo el título del formulario.
+/// Banner de error compacto.
 class _ErrorBanner extends StatelessWidget {
   const _ErrorBanner({required this.message});
 

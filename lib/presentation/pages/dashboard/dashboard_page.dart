@@ -43,7 +43,7 @@ class DashboardPage extends ConsumerWidget {
             icon: const Icon(Icons.logout),
             tooltip: 'Cerrar sesión',
             onPressed: () {
-              ref.read(authControllerProvider.notifier).logout();
+              ref.read(logoutProvider)();
             },
           ),
         ],

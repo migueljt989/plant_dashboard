@@ -18,79 +18,114 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   );
 });
 
-/// Maneja el ciclo de vida de la sesión (login / logout) y expone
-/// el usuario actual como [AsyncValue<AppUser?>].
-///
-/// - `AsyncValue.loading()` mientras se restaura o procesa la sesión.
-/// - `AsyncValue.data(user)` cuando la sesión está activa.
-/// - `AsyncValue.data(null)` cuando no hay sesión (estado inicial o tras logout).
-/// - `AsyncValue.error(failure, st)` si el login falló.
-final authControllerProvider =
-    AsyncNotifierProvider<AuthController, AppUser?>(() => AuthController());
+// ─────────────────────────────────────────────────────────────────────────────
+// Estado de sesión (lo que GoRouter observa)
+// ─────────────────────────────────────────────────────────────────────────────
 
-/// [AsyncNotifier] que encapsula la lógica de autenticación.
+/// Estado de sesión global. Solo tiene dos valores posibles:
+/// - `null` → no hay sesión activa
+/// - `AppUser` → sesión activa
 ///
-/// Implementa [ChangeNotifier] para que [GoRouter] pueda usarlo como
-/// `refreshListenable` y re-evaluar el guard de auth cada vez que el
-/// estado de sesión cambia (login / logout).
-///
-/// Consume [authRepositoryProvider] para login/logout.
-/// La UI no instancia ni [AuthRepositoryImpl] ni ningún datasource directamente.
-class AuthController extends AsyncNotifier<AppUser?> with ChangeNotifier {
-  /// Estado inicial: intenta restaurar la sesión desde localStorage.
-  ///
-  /// Si hay una sesión guardada (Requisito 1.4), se restaura el usuario y
-  /// el router lleva directamente al dashboard. Si no, el estado es null
-  /// y el guard de auth redirige a /login.
+/// GoRouter usa este provider (a través del [AuthSessionNotifier]) como
+/// `refreshListenable` para re-evaluar el redirect.
+/// Nunca expone loading ni error — esos son responsabilidad de los controllers
+/// de formulario.
+final authSessionProvider =
+    NotifierProvider<AuthSessionNotifier, AppUser?>(() => AuthSessionNotifier());
+
+/// Notifier simple que además implementa [ChangeNotifier] para que GoRouter
+/// pueda escucharlo como `refreshListenable`.
+class AuthSessionNotifier extends Notifier<AppUser?> with ChangeNotifier {
   @override
-  FutureOr<AppUser?> build() async {
-    final repo = ref.read(authRepositoryProvider);
-    // AuthRepositoryImpl expone restoreSession(); casteamos para acceder.
-    if (repo is AuthRepositoryImpl) {
-      return repo.restoreSession();
-    }
-    return null;
-  }
+  AppUser? build() => null; // Se resuelve en el init del app (restoreSession)
 
-  /// Sobreescribimos [state] para notificar a [GoRouter] cada vez que cambia
-  /// el estado de autenticación.
-  @override
-  set state(AsyncValue<AppUser?> newState) {
-    super.state = newState;
+  void setUser(AppUser? user) {
+    state = user;
     notifyListeners();
-  }
-
-  /// Notifica a los listeners (GoRouter) de un cambio en el estado de auth.
-  /// Necesario porque [build] resuelve sin pasar por el setter override.
-  void notifyAuthChanged() {
-    notifyListeners();
-  }
-
-  /// Intenta autenticar con [email] y [password].
-  ///
-  /// Actualiza el estado a `loading` durante la llamada.
-  /// En éxito expone `data(AppUser)`.
-  /// En fallo (credenciales incorrectas) expone `error(AuthFailure, stackTrace)`.
-  Future<void> login(String email, String password) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () => ref.read(authRepositoryProvider).login(email, password),
-    );
-  }
-
-  Future<void> register(String name, String email, String password) async {
-    state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () => ref.read(authRepositoryProvider).register(name,email, password),
-    );
-  }
-
-  /// Cierra la sesión y vuelve al estado `data(null)`.
-  Future<void> logout() async {
-    state = const AsyncValue.loading();
-    await AsyncValue.guard(
-      () => ref.read(authRepositoryProvider).logout(),
-    );
-    state = const AsyncValue.data(null);
   }
 }
+
+/// Provider que restaura la sesión al inicio de la app.
+/// Se lee una sola vez en el splash; su resultado se vuelca a [authSessionProvider].
+final restoreSessionProvider = FutureProvider<AppUser?>((ref) async {
+  final repo = ref.read(authRepositoryProvider);
+  if (repo is AuthRepositoryImpl) {
+    return repo.restoreSession();
+  }
+  return null;
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Controller de Login (estado de formulario)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Maneja el estado de loading/error del formulario de login.
+/// Es `autoDispose` — al salir de la página, el estado se limpia solo.
+final loginControllerProvider =
+    AsyncNotifierProvider.autoDispose<LoginController, void>(
+  () => LoginController(),
+);
+
+class LoginController extends AsyncNotifier<void> {
+  @override
+  FutureOr<void> build() {
+    // Estado inicial: idle (data(void))
+  }
+
+  Future<bool> login(String email, String password) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      () async {
+        final user =
+            await ref.read(authRepositoryProvider).login(email, password);
+        // Éxito → actualizar sesión global
+        ref.read(authSessionProvider.notifier).setUser(user);
+      },
+    );
+    return !state.hasError;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Controller de Register (estado de formulario)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Maneja el estado de loading/error del formulario de registro.
+/// Es `autoDispose` — al salir de la página, el estado se limpia solo.
+final registerControllerProvider =
+    AsyncNotifierProvider.autoDispose<RegisterController, void>(
+  () => RegisterController(),
+);
+
+class RegisterController extends AsyncNotifier<void> {
+  @override
+  FutureOr<void> build() {
+    // Estado inicial: idle (data(void))
+  }
+
+  Future<bool> register(String email, String password) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(
+      () async {
+        final user =
+            await ref.read(authRepositoryProvider).register(email, password);
+        // Éxito → actualizar sesión global
+        ref.read(authSessionProvider.notifier).setUser(user);
+      },
+    );
+    return !state.hasError;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Logout helper
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Función de logout accesible desde cualquier lugar (dashboard, interceptor).
+/// Limpia la sesión del repositorio y actualiza el estado global.
+final logoutProvider = Provider<Future<void> Function()>((ref) {
+  return () async {
+    await ref.read(authRepositoryProvider).logout();
+    ref.read(authSessionProvider.notifier).setUser(null);
+  };
+});

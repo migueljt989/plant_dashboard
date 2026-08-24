@@ -3,7 +3,6 @@ import '../../domain/entities/app_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth/auth_remote_datasource.dart';
 import '../datasources/auth/local_auth_datasource.dart';
-import '../models/app_user_dto.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource _dataSource;
@@ -21,8 +20,9 @@ class AuthRepositoryImpl implements AuthRepository {
     final userId = await _localStorage.readUserId();
     final email = await _localStorage.readEmail();
     final token = await _localStorage.readToken();
-    if (userId != null && email != null && token != null) {
-      _currentUser = AppUserDto(id: userId, email: email, token: token).toEntity();
+    final refreshToken = await _localStorage.readRefreshToken();
+    if (userId != null && email != null && token != null && refreshToken != null) {
+      _currentUser = AppUser(id: userId, email: email, token: token);
       _authStateController.add(_currentUser);
       return _currentUser;
     }
@@ -31,26 +31,27 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<AppUser> login(String email, String password) async {
-    final dto = await _dataSource.signIn(email, password);
-    _currentUser = dto.toEntity();
-    // Persistir la sesión para que sobreviva recargas.
+    final tokenPair = await _dataSource.signIn(email, password);
+    _currentUser = tokenPair.toEntity();
     await _localStorage.saveSession(
-      userId: _currentUser!.id,
-      email: _currentUser!.email,
-      token: _currentUser!.token
+      userId: tokenPair.userId,
+      email: tokenPair.email,
+      token: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
     );
     _authStateController.add(_currentUser);
     return _currentUser!;
   }
 
   @override
-  Future<AppUser> register(String name, String email, String password) async {
-    final dto = await _dataSource.register(name, email, password);
-    _currentUser = dto.toEntity();
+  Future<AppUser> register(String email, String password) async {
+    final tokenPair = await _dataSource.register(email, password);
+    _currentUser = tokenPair.toEntity();
     await _localStorage.saveSession(
-      userId: _currentUser!.id,
-      email: _currentUser!.email,
-      token: _currentUser!.token
+      userId: tokenPair.userId,
+      email: tokenPair.email,
+      token: tokenPair.accessToken,
+      refreshToken: tokenPair.refreshToken,
     );
     _authStateController.add(_currentUser);
     return _currentUser!;
@@ -59,7 +60,6 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     await _dataSource.signOut();
-    // Borrar la sesión persistida.
     await _localStorage.clearSession();
     _currentUser = null;
     _authStateController.add(null);
@@ -70,5 +70,4 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Stream<AppUser?> get authStateChanges => _authStateController.stream;
-  
 }
