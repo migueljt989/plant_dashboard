@@ -143,8 +143,8 @@ Implement full device and sensor management following Clean Architecture: domain
     - Implement `SensorsController extends AsyncNotifier<List<Sensor>>` with `build()` that calls `getAll()`, `createSensor(...)` that calls create + `ref.invalidateSelf()`, `updateSensor(...)` that calls update + `ref.invalidateSelf()`
     - _Requirements: 9.4, 9.5_
 
-- [ ] 8. Implement Devices Page UI
-  - [~] 8.1 Rewrite DevicesPage with full device management
+- [x] 8. Implement Devices Page UI
+  - [x] 8.1 Rewrite DevicesPage with full device management
     - Rewrite `lib/presentation/pages/devices/devices_page.dart` replacing the placeholder
     - Use `ConsumerWidget` watching `devicesControllerProvider`
     - Render device list using `AsyncValue.when()` for loading/error/data states
