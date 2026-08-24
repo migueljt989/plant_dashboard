@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/config/app_theme.dart';
 import '../../../domain/entities/alert_threshold.dart';
 import '../../../domain/entities/sensor_reading.dart';
-import '../../providers/auth/auth_providers.dart';
 import '../../providers/sensor/sensor_providers.dart';
 import '../../widgets/history_chart.dart';
 import '../../widgets/sensor_value_card.dart';
@@ -28,69 +26,48 @@ class DashboardPage extends ConsumerWidget {
     final readingAsync = ref.watch(latestReadingProvider(_deviceId));
     final thresholds = ref.watch(alertThresholdProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Row(
+    return readingAsync.when(
+      // ── Estado de carga ────────────────────────────────────────────
+      loading: () => const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.eco, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Monitoreo de Plantas'),
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Cargando lecturas…'),
           ],
         ),
-        actions: [
-          // ── Botón de cierre de sesión ─────────────────────────────────
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Cerrar sesión',
-            onPressed: () {
-              ref.read(logoutProvider)();
-            },
-          ),
-        ],
       ),
-      body: readingAsync.when(
-        // ── Estado de carga ────────────────────────────────────────────
-        loading: () => const Center(
+
+      // ── Estado de error (Requisito 2.3) ────────────────────────────
+      error: (error, stackTrace) => Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Cargando lecturas…'),
+              _ErrorBanner(
+                message: _resolveErrorMessage(error),
+              ),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Reintentar'),
+                onPressed: () {
+                  // Invalida el provider para forzar una nueva suscripción
+                  // al stream (Requisito 2.3 — vía de recuperación).
+                  ref.invalidate(latestReadingProvider(_deviceId));
+                },
+              ),
             ],
           ),
         ),
+      ),
 
-        // ── Estado de error (Requisito 2.3) ────────────────────────────
-        error: (error, stackTrace) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _ErrorBanner(
-                  message: _resolveErrorMessage(error),
-                ),
-                const SizedBox(height: 16),
-                FilledButton.icon(
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Reintentar'),
-                  onPressed: () {
-                    // Invalida el provider para forzar una nueva suscripción
-                    // al stream (Requisito 2.3 — vía de recuperación).
-                    ref.invalidate(latestReadingProvider(_deviceId));
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        // ── Estado con datos ───────────────────────────────────────────
-        data: (reading) => _DashboardBody(
-          reading: reading,
-          thresholds: thresholds,
-        ),
+      // ── Estado con datos ───────────────────────────────────────────
+      data: (reading) => _DashboardBody(
+        reading: reading,
+        thresholds: thresholds,
       ),
     );
   }

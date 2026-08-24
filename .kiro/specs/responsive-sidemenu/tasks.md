@@ -59,15 +59,15 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
     - Import `NavigationShell` and all page widgets
     - _Requirements: 1.1, 1.3, 1.4, 4.1, 4.2, 4.3, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-- [ ] 6. Refactor DashboardPage and create placeholder pages
-  - [~] 6.1 Refactor DashboardPage to remove Scaffold and AppBar
+- [x] 6. Refactor DashboardPage and create placeholder pages
+  - [x] 6.1 Refactor DashboardPage to remove Scaffold and AppBar
     - Remove the `Scaffold` wrapper and its `appBar` from `DashboardPage.build()`
     - Remove the logout `IconButton` from dashboard (it now lives in NavigationShell)
     - The widget should directly return the `readingAsync.when(...)` content (loading/error/data)
     - Keep all existing body content (`_DashboardBody`, `_HistorySection`, `_ErrorBanner`, etc.) unchanged
     - _Requirements: 1.2_
 
-  - [~] 6.2 Create placeholder pages for Dispositivos, Sensores, Lecturas, Alertas
+  - [x] 6.2 Create placeholder pages for Dispositivos, Sensores, Lecturas, Alertas
     - Create `lib/presentation/pages/devices/devices_page.dart` with `DevicesPage` StatelessWidget
     - Create `lib/presentation/pages/sensors/sensors_page.dart` with `SensorsPage` StatelessWidget
     - Create `lib/presentation/pages/readings/readings_page.dart` with `ReadingsPage` StatelessWidget
