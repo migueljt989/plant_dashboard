@@ -101,8 +101,8 @@ Implement full device and sensor management following Clean Architecture: domain
     - `update()`: PATCH `/sensors/{sensorId}` with only non-null fields, handle 404 → NotFoundFailure, 422 → ValidationFailure
     - _Requirements: 8.5, 8.6, 8.7, 8.8, 8.9, 8.10, 16.1, 16.2, 16.3_
 
-- [ ] 5. Create repository implementations
-  - [~] 5.1 Create DeviceRepositoryImpl
+- [x] 5. Create repository implementations
+  - [x] 5.1 Create DeviceRepositoryImpl
     - Create `lib/infrastructure/repositories/device_repository_impl.dart`
     - Import DeviceRepository contract, DeviceRemoteDataSource, Device entity, DeviceType, DeviceDto
     - Constructor receives `DeviceRemoteDataSource`
@@ -111,7 +111,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - `revoke()`: delegates to datasource `revoke()`, maps DTO via `toEntity()`
     - _Requirements: 9.1_
 
-  - [~] 5.2 Create SensorManagementRepositoryImpl
+  - [x] 5.2 Create SensorManagementRepositoryImpl
     - Create `lib/infrastructure/repositories/sensor_management_repository_impl.dart`
     - Import SensorManagementRepository contract, SensorRemoteManagementDataSource, Sensor entity, MetricType
     - Constructor receives `SensorRemoteManagementDataSource`
