@@ -48,8 +48,8 @@ Implement full device and sensor management following Clean Architecture: domain
     - Define `abstract class SensorManagementRepository` with methods: `Future<List<Sensor>> getAll()`, `Future<List<Sensor>> getByDevice(String deviceId)`, `Future<Sensor> create({required String deviceId, required String name, required MetricType metric, double? minOk, double? maxOk})`, `Future<Sensor> update({required String sensorId, String? name, double? minOk, double? maxOk, bool? isActive})`
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 2. Create infrastructure DTOs
-  - [ ] 2.1 Create DeviceDto
+- [x] 2. Create infrastructure DTOs
+  - [x] 2.1 Create DeviceDto
     - Create `lib/infrastructure/models/device_dto.dart`
     - Import Device entity and DeviceType enum
     - Define class with fields: `id`, `name`, `type` (String), `isActive`, `createdAt` (String)
@@ -57,7 +57,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - Implement `Device toEntity()` that converts type string via `DeviceType.fromString()` and parses `createdAt` via `DateTime.parse()`
     - _Requirements: 5.1, 5.2, 5.3_
 
-  - [ ] 2.2 Create SensorDto
+  - [x] 2.2 Create SensorDto
     - Create `lib/infrastructure/models/sensor_dto.dart`
     - Import Sensor entity and MetricType enum
     - Define class with fields: `id`, `deviceId`, `name`, `metric`, `unit` (String), `minOk` (double?), `maxOk` (double?), `isActive` (bool), `createdAt` (String)
