@@ -20,8 +20,8 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
     - Each item uses an outlined Material icon and references an `AppRoutes` constant
     - _Requirements: 2.1, 2.2_
 
-- [ ] 2. Create AppSidebar widget
-  - [~] 2.1 Implement AppSidebar with nav items and active highlighting
+- [x] 2. Create AppSidebar widget
+  - [x] 2.1 Implement AppSidebar with nav items and active highlighting
     - Create `lib/presentation/widgets/navigation/app_sidebar.dart`
     - Accepts `currentRoute` (String) and `onItemTap` (callback) parameters
     - Fixed width of 240px, background `AppColors.surface`
