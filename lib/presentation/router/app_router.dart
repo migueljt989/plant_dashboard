@@ -1,17 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../pages/alerts/alerts_page.dart';
 import '../pages/auth/login_page.dart';
 import '../pages/auth/register_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
+import '../pages/devices/devices_page.dart';
+import '../pages/readings/readings_page.dart';
+import '../pages/sensors/sensors_page.dart';
 import '../pages/splash/splash_page.dart';
 import '../providers/auth/auth_providers.dart';
+import '../widgets/navigation/navigation_shell.dart';
 import 'app_routes.dart';
 
 /// Provee el [GoRouter] configurado con:
 /// - Guard de autenticación basado en [authSessionProvider].
 /// - `refreshListenable` apuntando al [AuthSessionNotifier] para que el router
 ///   re-evalúe el guard solo cuando la sesión cambia (login/logout).
+/// - `ShellRoute` que envuelve las rutas autenticadas con [NavigationShell].
 ///
 /// El router NUNCA se entera de errores de formulario — esos viven en
 /// [loginControllerProvider] y [registerControllerProvider] que son autoDispose.
@@ -59,6 +65,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      // ── Rutas fuera del shell (sin sidebar) ─────────────────────
       GoRoute(
         path: AppRoutes.splash,
         builder: (context, state) => const SplashPage(),
@@ -71,9 +78,32 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.register,
         builder: (context, state) => const RegisterPage(),
       ),
-      GoRoute(
-        path: AppRoutes.dashboard,
-        builder: (context, state) => const DashboardPage(),
+
+      // ── Shell (con sidebar) ─────────────────────────────────────
+      ShellRoute(
+        builder: (context, state, child) => NavigationShell(child: child),
+        routes: [
+          GoRoute(
+            path: AppRoutes.dashboard,
+            builder: (context, state) => const DashboardPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.devices,
+            builder: (context, state) => const DevicesPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.sensors,
+            builder: (context, state) => const SensorsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.readings,
+            builder: (context, state) => const ReadingsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.alerts,
+            builder: (context, state) => const AlertsPage(),
+          ),
+        ],
       ),
     ],
   );

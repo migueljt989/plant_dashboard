@@ -48,8 +48,8 @@ Add a persistent responsive sidebar navigation to the plant IoT dashboard using 
 - [~] 4. Checkpoint - Verify sidebar widgets compile
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Rewrite app_router.dart with ShellRoute
-  - [~] 5.1 Update app_router.dart to use ShellRoute wrapping authenticated routes
+- [x] 5. Rewrite app_router.dart with ShellRoute
+  - [x] 5.1 Update app_router.dart to use ShellRoute wrapping authenticated routes
     - Keep `splash`, `login`, `register` as top-level GoRoute entries outside the shell
     - Add a `ShellRoute` with `builder` that returns `NavigationShell(child: child)`
     - Shell children: `/dashboard`, `/dispositivos`, `/sensores`, `/lecturas`, `/alertas`
