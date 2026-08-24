@@ -121,7 +121,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - `update()`: builds fields map from non-null parameters, delegates to datasource `update()`, maps DTO
     - _Requirements: 9.2_
 
-- [~] 6. Checkpoint - Infrastructure layer validation
+- [x] 6. Checkpoint - Infrastructure layer validation
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 7. Create Riverpod provider wiring
@@ -178,7 +178,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - Show SnackBar on operation failure
     - _Requirements: 13.1, 13.2, 13.3, 13.4, 14.1, 14.2, 14.3, 14.4, 14.5, 15.1, 15.2, 15.3, 15.4, 15.5, 16.4_
 
-- [~] 10. Final checkpoint - Full feature validation
+- [x] 10. Final checkpoint - Full feature validation
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
