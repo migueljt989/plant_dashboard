@@ -26,12 +26,10 @@ class TokenInterceptor extends Interceptor {
   ];
 
   TokenInterceptor({
-    required LocalAuthDataSource localStorage,
-    required AuthRemoteDataSource authDataSource,
-    required void Function() onSessionExpired,
-  })  : _localStorage = localStorage,
-        _authDataSource = authDataSource,
-        _onSessionExpired = onSessionExpired;
+    required this._localStorage,
+    required this._authDataSource,
+    required this._onSessionExpired,
+  });
 
   @override
   void onRequest(
