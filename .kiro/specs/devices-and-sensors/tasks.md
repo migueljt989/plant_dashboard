@@ -160,8 +160,8 @@ Implement full device and sensor management following Clean Architecture: domain
     - Show SnackBar on operation failure
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 12.1, 12.2, 12.3, 12.4, 12.5, 16.4_
 
-- [ ] 9. Implement Sensors Page UI
-  - [~] 9.1 Rewrite SensorsPage with full sensor management
+- [x] 9. Implement Sensors Page UI
+  - [x] 9.1 Rewrite SensorsPage with full sensor management
     - Rewrite `lib/presentation/pages/sensors/sensors_page.dart` replacing the placeholder
     - Use `ConsumerWidget` watching both `sensorsControllerProvider` and `devicesControllerProvider`
     - Map `deviceId → device.name` from the devices list for display
