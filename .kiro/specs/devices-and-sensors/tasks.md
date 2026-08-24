@@ -6,14 +6,14 @@ Implement full device and sensor management following Clean Architecture: domain
 
 ## Tasks
 
-- [ ] 1. Create domain layer entities and enums
-  - [ ] 1.1 Create DeviceType enum
+- [x] 1. Create domain layer entities and enums
+  - [x] 1.1 Create DeviceType enum
     - Create `lib/domain/entities/device_type.dart`
     - Define enum with values: `sensor`, `camera`, `irrigation`
     - Add `static DeviceType fromString(String value)` factory that maps backend strings to enum values (defaults to `sensor` on unknown)
     - _Requirements: 1.2, 1.3_
 
-  - [ ] 1.2 Create MetricType enum
+  - [x] 1.2 Create MetricType enum
     - Create `lib/domain/entities/metric_type.dart`
     - Define enum with values: `soilMoisture`, `airHumidity`, `temperature`, `uvIndex`
     - Add `static MetricType fromString(String value)` that maps snake_case backend strings (`soil_moisture`, `air_humidity`, `temperature`, `uv_index`) to enum values (defaults to `temperature` on unknown)
@@ -21,28 +21,28 @@ Implement full device and sensor management following Clean Architecture: domain
     - Add `String get label` getter returning Spanish UI labels: "Humedad de suelo", "Humedad ambiental", "Temperatura", "Índice UV"
     - _Requirements: 2.2, 2.3_
 
-  - [ ] 1.3 Create Device entity
+  - [x] 1.3 Create Device entity
     - Create `lib/domain/entities/device.dart`
     - Import `device_type.dart`
     - Define immutable class with fields: `id` (String), `name` (String), `type` (DeviceType), `isActive` (bool), `createdAt` (DateTime)
     - Use `const` constructor with all required named parameters
     - _Requirements: 1.1, 1.3_
 
-  - [ ] 1.4 Create Sensor entity
+  - [x] 1.4 Create Sensor entity
     - Create `lib/domain/entities/sensor.dart`
     - Import `metric_type.dart`
     - Define immutable class with fields: `id` (String), `deviceId` (String), `name` (String), `metric` (MetricType), `unit` (String), `minOk` (double?), `maxOk` (double?), `isActive` (bool), `createdAt` (DateTime)
     - Use `const` constructor with required fields and optional `minOk`/`maxOk`
     - _Requirements: 2.1, 2.3_
 
-  - [ ] 1.5 Create DeviceRepository contract
+  - [x] 1.5 Create DeviceRepository contract
     - Create `lib/domain/repositories/device_repository.dart`
     - Import Device entity and DeviceType enum
     - Define `typedef DeviceRegistration = ({Device device, String apiKey})`
     - Define `abstract class DeviceRepository` with methods: `Future<List<Device>> getAll()`, `Future<DeviceRegistration> register(String name, DeviceType type)`, `Future<Device> revoke(String deviceId)`
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [ ] 1.6 Create SensorManagementRepository contract
+  - [x] 1.6 Create SensorManagementRepository contract
     - Create `lib/domain/repositories/sensor_management_repository.dart`
     - Import Sensor entity and MetricType enum
     - Define `abstract class SensorManagementRepository` with methods: `Future<List<Sensor>> getAll()`, `Future<List<Sensor>> getByDevice(String deviceId)`, `Future<Sensor> create({required String deviceId, required String name, required MetricType metric, double? minOk, double? maxOk})`, `Future<Sensor> update({required String sensorId, String? name, double? minOk, double? maxOk, bool? isActive})`
