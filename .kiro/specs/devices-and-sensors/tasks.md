@@ -124,8 +124,8 @@ Implement full device and sensor management following Clean Architecture: domain
 - [~] 6. Checkpoint - Infrastructure layer validation
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Create Riverpod provider wiring
-  - [~] 7.1 Create device providers
+- [x] 7. Create Riverpod provider wiring
+  - [x] 7.1 Create device providers
     - Create `lib/presentation/providers/device/device_providers.dart`
     - Import Riverpod, domain entities/repos, infrastructure datasource + backend impl, `authenticatedDioProvider`, repository impl
     - Define `deviceDataSourceProvider`: Provider that creates `DeviceRemoteDataSourceBackend` using `ref.watch(authenticatedDioProvider)`
@@ -134,7 +134,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - Implement `DevicesController extends AsyncNotifier<List<Device>>` with `build()` that calls `getAll()`, `registerDevice(name, type)` that calls register + `ref.invalidateSelf()` + returns DeviceRegistration, `revokeDevice(deviceId)` that calls revoke + `ref.invalidateSelf()`
     - _Requirements: 9.3, 9.5_
 
-  - [~] 7.2 Create sensor management providers
+  - [x] 7.2 Create sensor management providers
     - Create `lib/presentation/providers/sensor/sensor_management_providers.dart`
     - Import Riverpod, domain entities/repos, infrastructure datasource + backend impl, `authenticatedDioProvider`, repository impl
     - Define `sensorManagementDataSourceProvider`: Provider that creates `SensorRemoteManagementDataSourceBackend` using `ref.watch(authenticatedDioProvider)`
