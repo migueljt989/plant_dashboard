@@ -2,35 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/device.dart';
+import '../../../domain/entities/device_type.dart';
 import '../../../domain/entities/metric_type.dart';
 import '../../../domain/entities/sensor.dart';
 import '../../providers/device/device_providers.dart';
 import '../../providers/sensor/sensor_management_providers.dart';
+import '../../providers/sensor/sensors_by_device_provider.dart';
+import '../../widgets/sensor_tile.dart';
 
 /// Página de gestión de sensores.
 ///
-/// Muestra la lista de todos los sensores con información del dispositivo
-/// al que pertenecen, permite crear nuevos sensores y editar los existentes.
+/// Muestra los sensores agrupados por dispositivo, permite crear nuevos
+/// sensores y editar los existentes.
 class SensorsPage extends ConsumerWidget {
   const SensorsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sensorsAsync = ref.watch(sensorsControllerProvider);
+    final groupedAsync = ref.watch(sensorsByDeviceProvider);
     final devicesAsync = ref.watch(devicesControllerProvider);
 
     return Scaffold(
-      body: sensorsAsync.when(
+      body: groupedAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => _ErrorState(error: error),
-        data: (sensors) {
-          final deviceMap = <String, String>{};
+        data: (grouped) {
+          final deviceMap = <String, Device>{};
           devicesAsync.whenData((devices) {
             for (final device in devices) {
-              deviceMap[device.id] = device.name;
+              deviceMap[device.id] = device;
             }
           });
-          return _SensorsList(sensors: sensors, deviceNameMap: deviceMap);
+          return _GroupedSensorsList(
+            grouped: grouped,
+            deviceMap: deviceMap,
+          );
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -136,25 +142,27 @@ class _ErrorState extends ConsumerWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Lista de sensores
+// Lista de sensores agrupados por dispositivo
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _SensorsList extends StatelessWidget {
-  const _SensorsList({
-    required this.sensors,
-    required this.deviceNameMap,
+class _GroupedSensorsList extends ConsumerWidget {
+  const _GroupedSensorsList({
+    required this.grouped,
+    required this.deviceMap,
   });
 
-  final List<Sensor> sensors;
-  final Map<String, String> deviceNameMap;
+  final Map<String, List<Sensor>> grouped;
+  final Map<String, Device> deviceMap;
 
   @override
-  Widget build(BuildContext context) {
-    if (sensors.isEmpty) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (grouped.isEmpty) {
       return const Center(
         child: Text('No hay sensores registrados.'),
       );
     }
+
+    final deviceIds = grouped.keys.toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -169,109 +177,26 @@ class _SensorsList extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 16),
-              ...sensors.map((sensor) => _SensorCard(
-                    sensor: sensor,
-                    deviceName:
-                        deviceNameMap[sensor.deviceId] ?? 'Dispositivo desconocido',
-                  )),
+              ...deviceIds.map((deviceId) {
+                final device = deviceMap[deviceId];
+                final sensors = grouped[deviceId]!;
+                return _DeviceGroup(
+                  deviceName: device?.name ?? 'Dispositivo desconocido',
+                  deviceType: device?.type,
+                  sensors: sensors,
+                  onEditSensor: (sensor) =>
+                      _showEditDialog(context, ref, sensor),
+                );
+              }),
             ],
           ),
         ),
       ),
     );
   }
-}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tarjeta de sensor individual
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _SensorCard extends ConsumerWidget {
-  const _SensorCard({
-    required this.sensor,
-    required this.deviceName,
-  });
-
-  final Sensor sensor;
-  final String deviceName;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Icono del tipo de métrica
-            Icon(
-              _iconForMetric(sensor.metric),
-              size: 32,
-              color: colorScheme.primary,
-            ),
-            const SizedBox(width: 16),
-
-            // Información del sensor
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    sensor.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${sensor.metric.label} (${sensor.unit})',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Rango: ${_formatThreshold(sensor.minOk)} – ${_formatThreshold(sensor.maxOk)}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Dispositivo: $deviceName',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
-
-            // Chip de estado
-            Chip(
-              label: Text(
-                sensor.isActive ? 'Activo' : 'Inactivo',
-                style: TextStyle(
-                  color: sensor.isActive
-                      ? Colors.green.shade900
-                      : Colors.grey.shade700,
-                  fontSize: 12,
-                ),
-              ),
-              backgroundColor: sensor.isActive
-                  ? Colors.green.shade100
-                  : Colors.grey.shade200,
-              side: BorderSide.none,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-            ),
-            const SizedBox(width: 8),
-
-            // Botón de editar
-            TextButton(
-              onPressed: () => _showEditDialog(context, ref),
-              child: const Text('Editar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _showEditDialog(BuildContext context, WidgetRef ref) async {
+  Future<void> _showEditDialog(
+      BuildContext context, WidgetRef ref, Sensor sensor) async {
     final result = await showDialog<_EditSensorResult>(
       context: context,
       builder: (_) => _EditSensorDialog(sensor: sensor),
@@ -279,7 +204,6 @@ class _SensorCard extends ConsumerWidget {
 
     if (result == null || !context.mounted) return;
 
-    // Build only changed fields
     String? newName;
     double? newMinOk;
     double? newMaxOk;
@@ -314,26 +238,113 @@ class _SensorCard extends ConsumerWidget {
       );
     }
   }
+}
 
-  IconData _iconForMetric(MetricType metric) {
-    switch (metric) {
-      case MetricType.soilMoisture:
-        return Icons.water_drop;
-      case MetricType.airHumidity:
-        return Icons.cloud;
-      case MetricType.temperature:
-        return Icons.thermostat;
-      case MetricType.uvIndex:
-        return Icons.wb_sunny;
-    }
+// ─────────────────────────────────────────────────────────────────────────────
+// Grupo de sensores bajo un dispositivo
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _DeviceGroup extends StatelessWidget {
+  const _DeviceGroup({
+    required this.deviceName,
+    required this.deviceType,
+    required this.sensors,
+    required this.onEditSensor,
+  });
+
+  final String deviceName;
+  final DeviceType? deviceType;
+  final List<Sensor> sensors;
+  final void Function(Sensor sensor) onEditSensor;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header del dispositivo
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  _iconForDeviceType(deviceType),
+                  size: 20,
+                  color: colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  deviceName,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '(${sensors.length} ${sensors.length == 1 ? 'sensor' : 'sensores'})',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          // Lista de sensores
+          ...sensors.map(
+            (sensor) => SensorTile(
+              sensor: sensor,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Chip(
+                    label: Text(
+                      sensor.isActive ? 'Activo' : 'Inactivo',
+                      style: TextStyle(
+                        color: sensor.isActive
+                            ? Colors.green.shade900
+                            : Colors.grey.shade700,
+                        fontSize: 12,
+                      ),
+                    ),
+                    backgroundColor: sensor.isActive
+                        ? Colors.green.shade100
+                        : Colors.grey.shade200,
+                    side: BorderSide.none,
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                  ),
+                  const SizedBox(width: 4),
+                  TextButton(
+                    onPressed: () => onEditSensor(sensor),
+                    child: const Text('Editar'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  String _formatThreshold(double? value) {
-    if (value == null) return '—';
-    // Remove trailing zeros for cleaner display
-    return value == value.roundToDouble()
-        ? value.toInt().toString()
-        : value.toString();
+  IconData _iconForDeviceType(DeviceType? type) {
+    switch (type) {
+      case DeviceType.sensor:
+        return Icons.sensors;
+      case DeviceType.camera:
+        return Icons.videocam;
+      case DeviceType.irrigation:
+        return Icons.water_drop;
+      case null:
+        return Icons.device_unknown;
+    }
   }
 }
 

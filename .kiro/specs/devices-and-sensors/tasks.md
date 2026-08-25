@@ -144,12 +144,15 @@ Implement full device and sensor management following Clean Architecture: domain
     - _Requirements: 9.4, 9.5_
 
 - [x] 8. Implement Devices Page UI
-  - [x] 8.1 Rewrite DevicesPage with full device management
+  - [x] 8.1 Rewrite DevicesPage with full device management and expandable sensor view
     - Rewrite `lib/presentation/pages/devices/devices_page.dart` replacing the placeholder
-    - Use `ConsumerWidget` watching `devicesControllerProvider`
+    - Use `ConsumerWidget` watching `devicesControllerProvider` and `sensorsByDeviceProvider`
     - Render device list using `AsyncValue.when()` for loading/error/data states
-    - Each device tile/card shows: name (title), type icon, status Chip (Activo/green vs Revocado/grey), creation date
-    - Active devices show a "Revocar" action button; disabled for inactive devices
+    - Each device is a `Card` with `clipBehavior: Clip.antiAlias` wrapping an `ExpansionTile`
+    - `ExpansionTile` configured with `shape: const Border()` and `collapsedShape: const Border()` to remove default dividers
+    - Leading: device type icon; Title: device name; Subtitle: creation date + sensor count (e.g. "· 2 sensores")
+    - Trailing: status Chip (Activo/green vs Revocado/grey) + "Revocar" TextButton (disabled for inactive)
+    - Expanded children: list of `SensorTile` widgets for that device's sensors, or italic "Sin sensores asignados" text
     - Loading state: `CircularProgressIndicator`
     - Error state: error message with a retry button that calls `ref.invalidate(devicesControllerProvider)`
     - Add FAB "Registrar dispositivo" that opens a registration dialog
@@ -158,15 +161,25 @@ Implement full device and sensor management following Clean Architecture: domain
     - On dismiss of API key dialog: list refreshes automatically via `invalidateSelf()`
     - Revoke flow: confirmation AlertDialog with warning text → calls `revokeDevice(id)` → list refreshes
     - Show SnackBar on operation failure
-    - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 12.1, 12.2, 12.3, 12.4, 12.5, 16.4_
+    - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7, 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 12.1, 12.2, 12.3, 12.4, 12.5, 16.4_
 
 - [x] 9. Implement Sensors Page UI
-  - [x] 9.1 Rewrite SensorsPage with full sensor management
+  - [x] 9.0 Create shared SensorTile widget and sensorsByDeviceProvider
+    - Create `lib/presentation/widgets/sensor_tile.dart`
+    - Implement compact `ListTile`-based widget accepting a `Sensor`, optional `trailing` widget, and optional `onTap`
+    - Shows metric icon (leading), sensor name (title), metric label + unit + threshold range (subtitle)
+    - Default trailing: active/inactive Chip
+    - Create `lib/presentation/providers/sensor/sensors_by_device_provider.dart`
+    - Derives `Map<String, List<Sensor>>` grouped by deviceId from `sensorsControllerProvider` via `whenData`
+    - No extra backend call — reorganizes existing data
+    - _Requirements: 10.6, 13.3, 13.6_
+
+  - [x] 9.1 Rewrite SensorsPage with grouped-by-device layout
     - Rewrite `lib/presentation/pages/sensors/sensors_page.dart` replacing the placeholder
-    - Use `ConsumerWidget` watching both `sensorsControllerProvider` and `devicesControllerProvider`
-    - Map `deviceId → device.name` from the devices list for display
-    - Render sensor list using `AsyncValue.when()` for loading/error/data states
-    - Each sensor row/card shows: name, metric label (via `MetricType.label`), unit, min_ok/max_ok (or "—" if null), device name, status
+    - Use `ConsumerWidget` watching `sensorsByDeviceProvider` and `devicesControllerProvider`
+    - Map `deviceId → Device` from the devices list for display (name, type icon)
+    - Render grouped sensor list: each device group is a `Card` with a colored header (`surfaceContainerHighest` background) showing device icon + name + sensor count
+    - Within each group: list of `SensorTile` widgets with custom trailing (status chip + "Editar" TextButton)
     - Loading state: `CircularProgressIndicator`
     - Error state: error message with retry button
     - Add FAB "Crear sensor" that opens a creation dialog
@@ -176,7 +189,7 @@ Implement full device and sensor management following Clean Architecture: domain
     - Edit dialog: prepopulated TextField for name, TextFormFields for min_ok/max_ok (clearable to null)
     - On submit: sends only changed fields via `updateSensor()`
     - Show SnackBar on operation failure
-    - _Requirements: 13.1, 13.2, 13.3, 13.4, 14.1, 14.2, 14.3, 14.4, 14.5, 15.1, 15.2, 15.3, 15.4, 15.5, 16.4_
+    - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 14.1, 14.2, 14.3, 14.4, 14.5, 15.1, 15.2, 15.3, 15.4, 15.5, 16.4_
 
 - [x] 10. Final checkpoint - Full feature validation
   - Ensure all tests pass, ask the user if questions arise.
@@ -189,7 +202,8 @@ Implement full device and sensor management following Clean Architecture: domain
 - All HTTP calls use `authenticatedDioProvider` (already existing) — no new Dio instances needed
 - Error handling follows existing patterns in `app_failure.dart`: NotFoundFailure, ValidationFailure, NetworkFailure
 - Controllers use `ref.invalidateSelf()` after mutations to re-fetch the list automatically
-- SensorsPage watches both sensors and devices providers to resolve deviceId → device name
+- `sensorsByDeviceProvider` derives the grouped structure from `sensorsControllerProvider` without extra backend calls
+- Both DevicesPage and SensorsPage share the `SensorTile` widget and `sensorsByDeviceProvider` for consistent display
 
 ## Task Dependency Graph
 
@@ -204,7 +218,8 @@ Implement full device and sensor management following Clean Architecture: domain
     { "id": 5, "tasks": ["4.2", "4.4"] },
     { "id": 6, "tasks": ["5.1", "5.2"] },
     { "id": 7, "tasks": ["7.1", "7.2"] },
-    { "id": 8, "tasks": ["8.1", "9.1"] }
+    { "id": 8, "tasks": ["9.0"] },
+    { "id": 9, "tasks": ["8.1", "9.1"] }
   ]
 }
 ```

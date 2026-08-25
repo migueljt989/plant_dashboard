@@ -724,19 +724,72 @@ class SensorsController extends AsyncNotifier<List<Sensor>> {
 
 ---
 
-### 6. Presentation Layer — Devices Page
+### 6. Presentation Layer — Shared Widgets and Derived Providers
+
+#### SensorTile Widget
+
+```dart
+// lib/presentation/widgets/sensor_tile.dart
+import 'package:flutter/material.dart';
+import '../../domain/entities/metric_type.dart';
+import '../../domain/entities/sensor.dart';
+
+/// Compact reusable widget showing basic sensor info.
+/// Used in both the Sensors page (grouped by device) and
+/// the Devices page (inside ExpansionTile).
+class SensorTile extends StatelessWidget {
+  const SensorTile({required this.sensor, this.trailing, this.onTap, super.key});
+
+  final Sensor sensor;
+  final Widget? trailing;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    // ListTile with metric icon, name, subtitle with metric label + unit + threshold range
+    // Default trailing: active/inactive Chip
+  }
+}
+```
+
+#### sensorsByDeviceProvider
+
+```dart
+// lib/presentation/providers/sensor/sensors_by_device_provider.dart
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../domain/entities/sensor.dart';
+import 'sensor_management_providers.dart';
+
+/// Derives a Map<deviceId, List<Sensor>> from sensorsControllerProvider.
+/// No extra backend call — just reorganizes the same data.
+final sensorsByDeviceProvider =
+    Provider<AsyncValue<Map<String, List<Sensor>>>>((ref) {
+  final sensorsAsync = ref.watch(sensorsControllerProvider);
+  return sensorsAsync.whenData((sensors) {
+    final grouped = <String, List<Sensor>>{};
+    for (final sensor in sensors) {
+      grouped.putIfAbsent(sensor.deviceId, () => []).add(sensor);
+    }
+    return grouped;
+  });
+});
+```
+
+### 7. Presentation Layer — Devices Page
 
 ```dart
 // lib/presentation/pages/devices/devices_page.dart
 
-/// Replaces the current DevicesPlaceholder.
 /// Structure:
-/// - AppBar-level FAB or action button → opens register dialog
-/// - Body: list of device cards/tiles showing name, type icon, status chip, date
-/// - Each active device tile has a "Revocar" action (disabled for inactive)
+/// - Body: list of device cards using ExpansionTile
+///   - Header: device name, type icon, status chip, creation date, sensor count
+///   - Expanded children: SensorTile list (or "Sin sensores asignados" if empty)
+///   - shape/collapsedShape set to Border() to remove default dividers
+/// - FAB "Registrar dispositivo" → opens register dialog
+/// - Active devices show a "Revocar" action button; disabled for inactive
 /// - Loading/error states via AsyncValue.when()
 class DevicesPage extends ConsumerWidget {
-  // Uses devicesControllerProvider
+  // Uses devicesControllerProvider + sensorsByDeviceProvider
   // Register: showDialog → form (name TextField + DeviceType dropdown)
   //   → on success: shows ApiKeyDialog with copy button + warning
   // Revoke: showDialog → confirmation → calls revokeDevice(id)
@@ -744,33 +797,39 @@ class DevicesPage extends ConsumerWidget {
 ```
 
 **UI details:**
-- Device card shows: name (title), type icon (sensors/camera/irrigation), status Chip (Activo/green vs Revocado/grey), creation date
-- FAB or header button "Registrar dispositivo" → opens modal form
-- API key dialog: prominent monospace text, "Copiar" button using `Clipboard.setData`, warning text "Esta clave solo se muestra una vez"
+- Each device is a `Card` with `clipBehavior: Clip.antiAlias` wrapping an `ExpansionTile`
+- `ExpansionTile` uses `shape: const Border()` and `collapsedShape: const Border()` to eliminate default top/bottom dividers
+- Leading: device type icon; Title: device name; Subtitle: creation date + sensor count
+- Trailing: status Chip + "Revocar" button
+- Expanded children: list of `SensorTile` widgets for that device's sensors, or italic "Sin sensores asignados" text
+- FAB "Registrar dispositivo" opens modal form
+- API key dialog: prominent monospace text, "Copiar" button (Clipboard.setData), warning "Esta clave solo se muestra una vez"
 - Revoke confirmation: AlertDialog with warning text, "Cancelar" and "Revocar" buttons
 - Error states: SnackBar for operation failures, full-page error banner for list fetch failure
 
-### 7. Presentation Layer — Sensors Page
+### 8. Presentation Layer — Sensors Page
 
 ```dart
 // lib/presentation/pages/sensors/sensors_page.dart
 
-/// Replaces the current SensorsPlaceholder.
 /// Structure:
-/// - Header action → opens create dialog
-/// - Body: list/table of sensors showing name, metric label, unit, thresholds, device name, status
-/// - Each sensor has an "Editar" action → opens edit dialog
+/// - Body: sensors grouped by device in visual card sections
+///   - Each device group: Card with colored header showing device name/icon/count
+///   - Sensor rows within each group use SensorTile with edit button
+/// - FAB "Crear sensor" → opens creation dialog
 /// - Loading/error states via AsyncValue.when()
 class SensorsPage extends ConsumerWidget {
-  // Uses sensorsControllerProvider + devicesControllerProvider (for device names + create form)
+  // Uses sensorsByDeviceProvider + devicesControllerProvider (for device info + create form)
   // Create: showDialog → form (device dropdown [active only], name, metric dropdown, min_ok, max_ok)
   // Edit: showDialog → form prepopulated with current values (name, min_ok, max_ok)
 }
 ```
 
 **UI details:**
-- Sensor row/card shows: name, metric type label (from MetricType.label), unit, min_ok/max_ok (or "—" if null), device name, status
-- To show device names, the page needs both `sensorsControllerProvider` and `devicesControllerProvider` — maps deviceId → device.name
+- Watches `sensorsByDeviceProvider` (grouped Map) and `devicesControllerProvider` (for device names/types)
+- Each device group rendered as a `Card` with:
+  - Header: `Container` with `surfaceContainerHighest` background, showing device icon + name + sensor count
+  - Body: list of `SensorTile` widgets with custom trailing (status chip + "Editar" button)
 - Create form: DropdownButtonFormField for device (active devices only), TextField for name, DropdownButtonFormField for MetricType, two optional TextFormFields for min_ok/max_ok
 - Edit form: TextField name (prefilled), TextFormFields for min_ok/max_ok (prefilled, clearable)
 - Clearing a threshold: if field is emptied, send null to backend
@@ -797,6 +856,8 @@ class SensorsPage extends ConsumerWidget {
 | `lib/infrastructure/repositories/sensor_management_repository_impl.dart` | **New** | R9 |
 | `lib/presentation/providers/device/device_providers.dart` | **New** | R9, R10-R12 |
 | `lib/presentation/providers/sensor/sensor_management_providers.dart` | **New** | R9, R13-R15 |
+| `lib/presentation/providers/sensor/sensors_by_device_provider.dart` | **New** | R13 |
+| `lib/presentation/widgets/sensor_tile.dart` | **New** | R10, R13 |
 | `lib/presentation/pages/devices/devices_page.dart` | Rewrite (replace placeholder) | R10-R12, R16 |
 | `lib/presentation/pages/sensors/sensors_page.dart` | Rewrite (replace placeholder) | R13-R15, R16 |
 
@@ -806,7 +867,10 @@ class SensorsPage extends ConsumerWidget {
 2. **`authenticatedDioProvider` for all calls** — No new Dio instance needed. The existing interceptor handles token attachment and refresh transparently.
 3. **DeviceRegistration as a Dart record** `({Device device, String apiKey})` — Clean way to return both pieces from the register method without creating a throwaway class.
 4. **Controllers use `ref.invalidateSelf()`** — After a mutation (register, revoke, create, update), the controller invalidates itself to re-fetch the fresh list. Simple and correct.
-5. **Sensors page needs device names** — Watches both `sensorsControllerProvider` and `devicesControllerProvider` to map `deviceId → device.name` for display.
-6. **MetricType.toBackendString()** — Explicit conversion instead of relying on `.name` (which would give camelCase instead of snake_case).
-7. **Register API key dialog** — Shown immediately after successful registration with a prominent copy button and a "shown only once" warning. No persistence of the key in the frontend.
-8. **Revoke is destructive** — Requires confirmation dialog before execution. Disabled (greyed out) for already-inactive devices.
+5. **Sensors page groups by device** — Uses `sensorsByDeviceProvider` (derived from `sensorsControllerProvider` via `whenData`) to group sensors by `deviceId` without an extra backend call. The UI renders each group as a card with a device header.
+6. **Devices page shows sensors via ExpansionTile** — Each device card is expandable to reveal its associated sensors inline, using the same `sensorsByDeviceProvider` and the shared `SensorTile` widget.
+7. **Shared `SensorTile` widget** — A compact, reusable `ListTile`-based widget used in both the Sensors page (within device groups) and the Devices page (inside ExpansionTile children). Accepts an optional `trailing` widget for context-specific actions.
+8. **ExpansionTile dividers removed** — `shape: const Border()` and `collapsedShape: const Border()` eliminate the default top/bottom divider lines that look jarring in dark themes.
+9. **MetricType.toBackendString()** — Explicit conversion instead of relying on `.name` (which would give camelCase instead of snake_case).
+10. **Register API key dialog** — Shown immediately after successful registration with a prominent copy button and a "shown only once" warning. No persistence of the key in the frontend.
+11. **Revoke is destructive** — Requires confirmation dialog before execution. Disabled (greyed out) for already-inactive devices.

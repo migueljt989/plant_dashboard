@@ -126,17 +126,19 @@ Full devices and sensors management feature for the Flutter Web plant IoT dashbo
 4. THE provider wiring SHALL expose a sensorManagementRepositoryProvider of type Provider of Sensor_Repository_Management.
 5. THE datasource providers SHALL use the authenticatedDioProvider to construct the backend datasource implementations.
 
-### Requirement 10: Devices Page — List Devices with Status
+### Requirement 10: Devices Page — List Devices with Status and Associated Sensors
 
-**User Story:** As a user, I want to see a list of all my registered IoT devices with their current active/inactive status, so that I can monitor which devices are operational.
+**User Story:** As a user, I want to see a list of all my registered IoT devices with their current active/inactive status and the ability to expand each device to see its associated sensors inline, so that I can quickly understand the topology of my sensor network.
 
 #### Acceptance Criteria
 
 1. WHEN the user navigates to /dispositivos, THE Devices_Page SHALL fetch and display the list of all registered devices.
-2. THE Devices_Page SHALL display each device's name, type, active status, and creation date.
+2. THE Devices_Page SHALL display each device's name, type icon, active status, creation date, and a count of associated sensors in the subtitle.
 3. WHILE the device list is loading, THE Devices_Page SHALL display a loading indicator.
 4. IF the device list fetch fails, THEN THE Devices_Page SHALL display an error message with a retry option.
 5. THE Devices_Page SHALL visually distinguish active devices from inactive (revoked) devices.
+6. WHEN the user expands a device card, THE Devices_Page SHALL display the list of sensors associated with that device using a shared SensorTile widget.
+7. IF a device has no associated sensors, THEN the expanded section SHALL display a "Sin sensores asignados" message.
 
 ### Requirement 11: Devices Page — Register New Device
 
@@ -163,16 +165,18 @@ Full devices and sensors management feature for the Flutter Web plant IoT dashbo
 4. IF the revocation request fails, THEN THE Devices_Page SHALL display the error message to the user.
 5. THE Devices_Page SHALL disable the revoke action for devices that are already inactive.
 
-### Requirement 13: Sensors Page — List All Sensors with Device Info
+### Requirement 13: Sensors Page — List All Sensors Grouped by Device
 
-**User Story:** As a user, I want to see a list of all sensors across all my devices with information about which device each sensor belongs to, so that I can have a consolidated view of my sensor infrastructure.
+**User Story:** As a user, I want to see all my sensors visually grouped by the device they belong to, with a clear header for each device, so that I can understand the relationship between devices and sensors at a glance.
 
 #### Acceptance Criteria
 
-1. WHEN the user navigates to /sensores, THE Sensors_Page SHALL fetch and display the list of all sensors across all devices.
-2. THE Sensors_Page SHALL display each sensor's name, metric type, unit, threshold values (min_ok and max_ok when set), active status, and the name of the device it belongs to.
-3. WHILE the sensor list is loading, THE Sensors_Page SHALL display a loading indicator.
-4. IF the sensor list fetch fails, THEN THE Sensors_Page SHALL display an error message with a retry option.
+1. WHEN the user navigates to /sensores, THE Sensors_Page SHALL fetch and display the list of all sensors grouped by their parent device.
+2. THE Sensors_Page SHALL display a device group header for each device showing the device name, type icon, and sensor count.
+3. Within each device group, THE Sensors_Page SHALL display each sensor's name, metric type, unit, threshold values (min_ok and max_ok when set), and active status using a shared SensorTile widget.
+4. WHILE the sensor list is loading, THE Sensors_Page SHALL display a loading indicator.
+5. IF the sensor list fetch fails, THEN THE Sensors_Page SHALL display an error message with a retry option.
+6. THE Sensors_Page SHALL derive the grouped structure from a sensorsByDeviceProvider that reorganizes the flat sensor list by deviceId without making additional backend calls.
 
 ### Requirement 14: Sensors Page — Create Sensor on a Device
 

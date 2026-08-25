@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../domain/entities/device.dart';
 import '../../../domain/entities/device_type.dart';
+import '../../../domain/entities/sensor.dart';
 import '../../providers/device/device_providers.dart';
+import '../../providers/sensor/sensors_by_device_provider.dart';
+import '../../widgets/sensor_tile.dart';
 
 /// Página de gestión de dispositivos.
 ///
@@ -120,18 +123,24 @@ class _ErrorState extends ConsumerWidget {
 // Lista de dispositivos
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _DevicesList extends StatelessWidget {
+class _DevicesList extends ConsumerWidget {
   const _DevicesList({required this.devices});
 
   final List<Device> devices;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (devices.isEmpty) {
       return const Center(
         child: Text('No hay dispositivos registrados.'),
       );
     }
+
+    final sensorsByDeviceAsync = ref.watch(sensorsByDeviceProvider);
+    final sensorsByDevice = <String, List<Sensor>>{};
+    sensorsByDeviceAsync.whenData((data) {
+      sensorsByDevice.addAll(data);
+    });
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -146,7 +155,10 @@ class _DevicesList extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 16),
-              ...devices.map((device) => _DeviceCard(device: device)),
+              ...devices.map((device) => _DeviceCard(
+                    device: device,
+                    sensors: sensorsByDevice[device.id] ?? [],
+                  )),
             ],
           ),
         ),
@@ -160,9 +172,10 @@ class _DevicesList extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _DeviceCard extends ConsumerWidget {
-  const _DeviceCard({required this.device});
+  const _DeviceCard({required this.device, required this.sensors});
 
   final Device device;
+  final List<Sensor> sensors;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -170,36 +183,27 @@ class _DeviceCard extends ConsumerWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        shape: const Border(),
+        collapsedShape: const Border(),
+        leading: Icon(
+          _iconForType(device.type),
+          size: 32,
+          color: colorScheme.primary,
+        ),
+        title: Text(
+          device.name,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        subtitle: Text(
+          'Creado: ${_formatDate(device.createdAt)}'
+          '${sensors.isNotEmpty ? ' · ${sensors.length} ${sensors.length == 1 ? 'sensor' : 'sensores'}' : ''}',
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Icono del tipo de dispositivo
-            Icon(
-              _iconForType(device.type),
-              size: 32,
-              color: colorScheme.primary,
-            ),
-            const SizedBox(width: 16),
-
-            // Información del dispositivo
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    device.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Creado: ${_formatDate(device.createdAt)}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-            ),
-
             // Chip de estado
             Chip(
               label: Text(
@@ -218,7 +222,6 @@ class _DeviceCard extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
             ),
             const SizedBox(width: 8),
-
             // Botón de revocar
             TextButton(
               onPressed:
@@ -227,6 +230,19 @@ class _DeviceCard extends ConsumerWidget {
             ),
           ],
         ),
+        children: [
+          if (sensors.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Text(
+                'Sin sensores asignados',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+            )
+          else
+            ...sensors.map((sensor) => SensorTile(sensor: sensor)),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }
