@@ -54,11 +54,15 @@ final appTheme = ThemeData(
   colorScheme: const ColorScheme.dark(
     primary: AppColors.primary,
     surface: AppColors.surface,
+    surfaceTint: Colors.transparent,
     error: AppColors.error,
     onPrimary: Colors.white,
     onSurface: AppColors.textPrimary,
   ),
   scaffoldBackgroundColor: AppColors.background,
+  progressIndicatorTheme: const ProgressIndicatorThemeData(
+    linearMinHeight: 4,
+  ),
   cardTheme: const CardThemeData(color: AppColors.surface),
   appBarTheme: const AppBarTheme(
     backgroundColor: AppColors.surface,

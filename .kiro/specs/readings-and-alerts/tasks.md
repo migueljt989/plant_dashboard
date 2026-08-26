@@ -168,8 +168,8 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
 - [~] 10. Checkpoint - Verify providers compile and wire correctly
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 11. Implement ReadingsPage UI
-  - [~] 11.1 Rewrite ReadingsPage
+- [x] 11. Implement ReadingsPage UI
+  - [x] 11.1 Rewrite ReadingsPage
     - Rewrite `lib/presentation/pages/readings/readings_page.dart` replacing the placeholder
     - Add latest reading summary card at the top consuming `latestReadingProvider` (show loading placeholder, "sin datos" on null, sensor name + metric + value + unit + timestamp on data)
     - Add filter row with: device dropdown (from devicesControllerProvider), sensor dropdown (from sensorsControllerProvider), metric dropdown (MetricType values), date range picker (from/to)
