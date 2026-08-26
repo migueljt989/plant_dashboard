@@ -116,28 +116,28 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
 - [~] 7. Checkpoint - Verify infrastructure layer compiles
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 8. Create presentation filter and state models
-  - [~] 8.1 Create ReadingsFilter model
+- [x] 8. Create presentation filter and state models
+  - [x] 8.1 Create ReadingsFilter model
     - Create `lib/presentation/providers/readings/readings_filter.dart`
     - Implement immutable class with optional fields: sensorId, deviceId, metric, from, to
     - Implement `copyWith` with clear flags for each nullable field
     - Implement `toQueryParams()` returning `Map<String, String>` with only non-null values
     - _Requirements: 9.2, 9.3_
 
-  - [~] 8.2 Create AlertsFilter model
+  - [x] 8.2 Create AlertsFilter model
     - Create `lib/presentation/providers/alerts/alerts_filter.dart`
     - Implement immutable class with optional fields: sensorId, deviceId, metric, alertType, from, to
     - Implement `copyWith` with clear flags for each nullable field
     - Implement `toQueryParams()` returning `Map<String, String>` with only non-null values
     - _Requirements: 11.2, 11.3_
 
-  - [~] 8.3 Create ReadingsState model
+  - [x] 8.3 Create ReadingsState model
     - Create `lib/presentation/providers/readings/readings_state.dart`
     - Implement class with fields: items (List<Reading>), total, limit (default 50), offset (default 0), filter (ReadingsFilter), isLoadingMore (bool)
     - Implement computed `hasMore` getter and `copyWith` method
     - _Requirements: 9.7, 9.8, 12.3_
 
-  - [~] 8.4 Create AlertsState model
+  - [x] 8.4 Create AlertsState model
     - Create `lib/presentation/providers/alerts/alerts_state.dart`
     - Implement class with fields: items (List<Alert>), total, limit (default 50), offset (default 0), filter (AlertsFilter), isLoadingMore (bool)
     - Implement computed `hasMore` getter and `copyWith` method
