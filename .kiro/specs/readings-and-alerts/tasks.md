@@ -58,7 +58,7 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Implement `toEntity()` converting to Alert domain entity using enum fromString methods
     - _Requirements: 2.2, 2.3, 2.4_
 
-- [~] 3. Checkpoint - Verify domain and models compile
+- [x] 3. Checkpoint - Verify domain and models compile
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 4. Create repository contracts
@@ -113,7 +113,7 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Implement `getAlerts`: delegate to datasource, map PaginatedResponse<AlertDto> to PaginatedResponse<Alert> using `toEntity()`
     - _Requirements: 8.2_
 
-- [~] 7. Checkpoint - Verify infrastructure layer compiles
+- [x] 7. Checkpoint - Verify infrastructure layer compiles
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 8. Create presentation filter and state models
@@ -165,7 +165,7 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
       - `loadMore()`: set isLoadingMore=true, fetch next page, append items, update offset
     - _Requirements: 13.1, 13.2, 13.3_
 
-- [~] 10. Checkpoint - Verify providers compile and wire correctly
+- [x] 10. Checkpoint - Verify providers compile and wire correctly
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 11. Implement ReadingsPage UI
@@ -191,34 +191,34 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Wire filter changes to call `applyFilters()` on the alerts controller
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5, 11.6, 11.7, 11.8, 11.9_
 
-- [~] 13. Final checkpoint - Verify full feature compiles
+- [x] 13. Final checkpoint - Verify full feature compiles
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 14. Property-based tests
-  - [ ]* 14.1 Add glados PBT dependency
+- [x] 14. Property-based tests
+  - [x]* 14.1 Add glados PBT dependency
     - Add `glados` package to dev_dependencies in pubspec.yaml
     - Run `flutter pub get` to install
     - _Requirements: 1.4, 2.4_
 
-  - [ ]* 14.2 Write property test for ReadingDto round-trip
+  - [x]* 14.2 Write property test for ReadingDto round-trip
     - **Property 1: ReadingDto round-trip serialization**
     - **Validates: Requirements 1.2, 1.3, 1.4**
     - Create test file `test/infrastructure/models/reading_dto_pbt_test.dart`
     - Generate arbitrary ReadingDto instances, verify `toJson()` → `fromJson()` → `toJson()` produces identical JSON maps
 
-  - [ ]* 14.3 Write property test for AlertDto round-trip
+  - [x]* 14.3 Write property test for AlertDto round-trip
     - **Property 2: AlertDto round-trip serialization**
     - **Validates: Requirements 2.2, 2.3, 2.4**
     - Create test file `test/infrastructure/models/alert_dto_pbt_test.dart`
     - Generate arbitrary AlertDto instances (including nullable fields), verify `toJson()` → `fromJson()` → `toJson()` produces identical JSON maps
 
-  - [ ]* 14.4 Write property test for enum round-trips
+  - [x]* 14.4 Write property test for enum round-trips
     - **Property 3: Alert enum round-trip**
     - **Validates: Requirements 3.1, 3.2, 3.3**
     - Create test file `test/domain/entities/enums_pbt_test.dart`
     - For each enum (AlertType, BreachedBound, DeliveryStatus): verify `toBackendString()` → `fromString()` returns original value
 
-  - [ ]* 14.5 Write property tests for PaginatedResponse
+  - [x]* 14.5 Write property tests for PaginatedResponse
     - **Property 4: PaginatedResponse parsing preserves items and metadata**
     - **Property 5: PaginatedResponse hasMore correctness**
     - **Validates: Requirements 4.1, 4.2, 4.3**
@@ -226,7 +226,7 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Generate arbitrary JSON with items array + pagination object, verify parsed instance preserves counts and metadata
     - Generate arbitrary offset/items.length/total combinations, verify `hasMore` equals `offset + items.length < total`
 
-- [~] 15. Final checkpoint - All tests pass
+- [x] 15. Final checkpoint - All tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
