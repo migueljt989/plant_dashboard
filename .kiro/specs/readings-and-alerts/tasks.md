@@ -6,32 +6,32 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
 
 ## Tasks
 
-- [ ] 1. Create domain enums and entities
-  - [ ] 1.1 Create AlertType enum
+- [x] 1. Create domain enums and entities
+  - [x] 1.1 Create AlertType enum
     - Create `lib/domain/entities/alert_type.dart` with values `breach`, `recovery`
     - Include `fromString(String)` static method with fallback to `breach`
     - Include `toBackendString()` method
     - _Requirements: 3.1_
 
-  - [ ] 1.2 Create BreachedBound enum
+  - [x] 1.2 Create BreachedBound enum
     - Create `lib/domain/entities/breached_bound.dart` with values `minOk`, `maxOk`
     - Include `fromString(String)` mapping from snake_case (`min_ok`, `max_ok`) with fallback to `minOk`
     - Include `toBackendString()` returning snake_case strings
     - _Requirements: 3.2_
 
-  - [ ] 1.3 Create DeliveryStatus enum
+  - [x] 1.3 Create DeliveryStatus enum
     - Create `lib/domain/entities/delivery_status.dart` with values `pending`, `sent`, `failed`, `skipped`
     - Include `fromString(String)` with fallback to `pending`
     - Include `toBackendString()` method
     - _Requirements: 3.3_
 
-  - [ ] 1.4 Create Reading entity
+  - [x] 1.4 Create Reading entity
     - Create `lib/domain/entities/reading.dart` with fields: id, sensorId, sensorName, deviceId, metric (MetricType), unit, value, recordedAt
     - Use `const` constructor with all required fields
     - Import existing `MetricType` from the devices-and-sensors feature
     - _Requirements: 1.1_
 
-  - [ ] 1.5 Create Alert entity
+  - [x] 1.5 Create Alert entity
     - Create `lib/domain/entities/alert.dart` with fields: id, sensorId, sensorName, deviceId, metric (MetricType), unit, alertType (AlertType), value, breachedBound (nullable), minOk (nullable), maxOk (nullable), triggeredAt, deliveryStatus
     - Use `const` constructor with required and optional fields
     - _Requirements: 2.1_
