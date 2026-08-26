@@ -179,8 +179,8 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Wire filter changes to call `applyFilters()` on the readings controller
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 10.1, 10.2, 10.3, 10.4_
 
-- [ ] 12. Implement AlertsPage UI
-  - [~] 12.1 Rewrite AlertsPage
+- [x] 12. Implement AlertsPage UI
+  - [x] 12.1 Rewrite AlertsPage
     - Rewrite `lib/presentation/pages/alerts/alerts_page.dart` replacing the placeholder
     - Add filter row with: device dropdown, sensor dropdown, metric dropdown, alert type dropdown (AlertType values), date range picker
     - Display alerts in a DataTable/ListView with columns: sensor name, metric, alert type, value+unit, breached bound + thresholds, triggered_at
