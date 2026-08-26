@@ -61,14 +61,14 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
 - [~] 3. Checkpoint - Verify domain and models compile
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Create repository contracts
-  - [~] 4.1 Create ReadingsRepository contract
+- [x] 4. Create repository contracts
+  - [x] 4.1 Create ReadingsRepository contract
     - Create `lib/domain/repositories/readings_repository.dart`
     - Define abstract class with `getReadings(...)` returning `Future<PaginatedResponse<Reading>>` accepting optional filters + limit/offset
     - Define `getLatestReading(...)` returning `Future<Reading>` accepting optional filters
     - _Requirements: 7.1, 7.2_
 
-  - [~] 4.2 Create AlertsRepository contract
+  - [x] 4.2 Create AlertsRepository contract
     - Create `lib/domain/repositories/alerts_repository.dart`
     - Define abstract class with `getAlerts(...)` returning `Future<PaginatedResponse<Alert>>` accepting optional filters + limit/offset
     - _Requirements: 8.1_
