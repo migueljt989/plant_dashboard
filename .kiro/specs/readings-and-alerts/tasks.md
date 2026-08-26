@@ -143,8 +143,8 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Implement computed `hasMore` getter and `copyWith` method
     - _Requirements: 11.8, 11.9, 13.3_
 
-- [ ] 9. Create Riverpod providers
-  - [~] 9.1 Create readings providers
+- [x] 9. Create Riverpod providers
+  - [x] 9.1 Create readings providers
     - Create `lib/presentation/providers/readings/readings_providers.dart`
     - Define `readingsDataSourceProvider`: Provider that returns ReadingsRemoteDataSourceBackend using `authenticatedDioProvider`
     - Define `readingsRepositoryProvider`: Provider that returns ReadingsRepositoryImpl using the datasource provider
@@ -155,7 +155,7 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Define `latestReadingProvider`: FutureProvider.autoDispose that reads the current filter from readingsControllerProvider and fetches the latest reading
     - _Requirements: 12.1, 12.2, 12.3, 12.4_
 
-  - [~] 9.2 Create alerts providers
+  - [x] 9.2 Create alerts providers
     - Create `lib/presentation/providers/alerts/alerts_providers.dart`
     - Define `alertsDataSourceProvider`: Provider that returns AlertsRemoteDataSourceBackend using `authenticatedDioProvider`
     - Define `alertsRepositoryProvider`: Provider that returns AlertsRepositoryImpl using the datasource provider
