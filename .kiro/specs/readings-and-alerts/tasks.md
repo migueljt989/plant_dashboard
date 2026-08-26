@@ -99,15 +99,15 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Handle DioException: throw NetworkFailure on errors
     - _Requirements: 6.2, 6.3_
 
-- [ ] 6. Create repository implementations
-  - [~] 6.1 Create ReadingsRepositoryImpl
+- [x] 6. Create repository implementations
+  - [x] 6.1 Create ReadingsRepositoryImpl
     - Create `lib/infrastructure/repositories/readings_repository_impl.dart`
     - Inject `ReadingsRemoteDataSource` via constructor
     - Implement `getReadings`: delegate to datasource, map PaginatedResponse<ReadingDto> to PaginatedResponse<Reading> using `toEntity()`
     - Implement `getLatestReading`: delegate to datasource, map ReadingDto to Reading
     - _Requirements: 7.3, 7.4_
 
-  - [~] 6.2 Create AlertsRepositoryImpl
+  - [x] 6.2 Create AlertsRepositoryImpl
     - Create `lib/infrastructure/repositories/alerts_repository_impl.dart`
     - Inject `AlertsRemoteDataSource` via constructor
     - Implement `getAlerts`: delegate to datasource, map PaginatedResponse<AlertDto> to PaginatedResponse<Alert> using `toEntity()`
