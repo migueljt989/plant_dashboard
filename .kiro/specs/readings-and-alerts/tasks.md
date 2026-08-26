@@ -73,18 +73,18 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Define abstract class with `getAlerts(...)` returning `Future<PaginatedResponse<Alert>>` accepting optional filters + limit/offset
     - _Requirements: 8.1_
 
-- [ ] 5. Create datasource contracts and implementations
-  - [~] 5.1 Create ReadingsRemoteDataSource contract
+- [x] 5. Create datasource contracts and implementations
+  - [x] 5.1 Create ReadingsRemoteDataSource contract
     - Create `lib/infrastructure/datasources/readings/readings_remote_datasource.dart`
     - Define abstract class with `fetchReadings(...)` returning `Future<PaginatedResponse<ReadingDto>>` and `fetchLatestReading(...)` returning `Future<ReadingDto>`
     - _Requirements: 5.1, 5.2_
 
-  - [~] 5.2 Create AlertsRemoteDataSource contract
+  - [x] 5.2 Create AlertsRemoteDataSource contract
     - Create `lib/infrastructure/datasources/alerts/alerts_remote_datasource.dart`
     - Define abstract class with `fetchAlerts(...)` returning `Future<PaginatedResponse<AlertDto>>`
     - _Requirements: 6.1_
 
-  - [~] 5.3 Create ReadingsRemoteDataSourceBackend implementation
+  - [x] 5.3 Create ReadingsRemoteDataSourceBackend implementation
     - Create `lib/infrastructure/datasources/readings/readings_remote_datasource_backend.dart`
     - Inject authenticated Dio instance via constructor
     - Implement `fetchReadings`: GET `/readings` with query params, parse response with `PaginatedResponse.fromJson` + `ReadingDto.fromJson`
@@ -92,7 +92,7 @@ Implement the readings history (`/lecturas`) and alerts (`/alertas`) pages for t
     - Handle DioException: 404 → throw NotFoundFailure, other errors → throw NetworkFailure
     - _Requirements: 5.3, 5.4, 5.5, 5.6_
 
-  - [~] 5.4 Create AlertsRemoteDataSourceBackend implementation
+  - [x] 5.4 Create AlertsRemoteDataSourceBackend implementation
     - Create `lib/infrastructure/datasources/alerts/alerts_remote_datasource_backend.dart`
     - Inject authenticated Dio instance via constructor
     - Implement `fetchAlerts`: GET `/alerts` with query params, parse response with `PaginatedResponse.fromJson` + `AlertDto.fromJson`
