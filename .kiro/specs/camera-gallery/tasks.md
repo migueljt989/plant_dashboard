@@ -93,8 +93,8 @@ Implements the camera gallery feature following clean architecture (domain → i
     - **Property 10: Camera devices filter returns only camera-type devices** — Filtering logic returns exactly those devices with type == camera, preserving order
     - **Validates: Requirements 11.7**
 
-- [ ] 7. Presentation layer — Controllers
-  - [ ] 7.1 Implement PhotoGalleryController (AsyncNotifier)
+- [x] 7. Presentation layer — Controllers
+  - [x] 7.1 Implement PhotoGalleryController (AsyncNotifier)
     - Create `lib/presentation/providers/camera/photo_gallery_controller.dart` with `PhotoGalleryController` extending `AsyncNotifier<PhotoGalleryState>`
     - Implement `build()` to load initial page (offset 0, limit 20, no filters)
     - Implement `applyFilters(PhotoGalleryFilter)` resetting offset to 0
@@ -110,7 +110,7 @@ Implements the camera gallery feature following clean architecture (domain → i
     - **Property 9: Load more appends items and advances offset** — When hasMore is true, loadMore appends new items and advances offset correctly
     - **Validates: Requirements 5.3, 5.6, 11.3**
 
-  - [ ] 7.3 Implement PhotoViewerController (AsyncNotifier.family)
+  - [x] 7.3 Implement PhotoViewerController (AsyncNotifier.family)
     - Create `lib/presentation/providers/camera/photo_viewer_controller.dart` with `PhotoViewerController` extending `AutoDisposeAsyncNotifier<Photo>` parameterized by photo ID
     - Implement `build()` to fetch photo metadata
     - Implement `deletePhoto()` returning success indicator for navigation
