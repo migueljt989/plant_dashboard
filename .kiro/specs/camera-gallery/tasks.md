@@ -69,12 +69,12 @@ Implements the camera gallery feature following clean architecture (domain → i
 - [x] 5. Checkpoint — Domain and infrastructure layers complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Presentation layer — Providers and state models
-  - [ ] 6.1 Create PhotoGalleryFilter model
+- [x] 6. Presentation layer — Providers and state models
+  - [x] 6.1 Create PhotoGalleryFilter model
     - Create `lib/presentation/providers/camera/photo_gallery_filter.dart` with `PhotoGalleryFilter` class (deviceId, from, to)
     - _Requirements: 5.2, 5.3_
 
-  - [ ] 6.2 Create PhotoGalleryState model
+  - [x] 6.2 Create PhotoGalleryState model
     - Create `lib/presentation/providers/camera/photo_gallery_state.dart` with `PhotoGalleryState` class (items, total, limit, offset, filter, isLoadingMore, selectedIds, isSelectionMode)
     - Implement `hasMore` getter: `offset + items.length < total`
     - Implement `copyWith` method for immutable state updates
@@ -84,7 +84,7 @@ Implements the camera gallery feature following clean architecture (domain → i
     - **Property 6: Pagination hasMore invariant** — `hasMore` returns true iff `offset + items.length < total`
     - **Validates: Requirements 5.7**
 
-  - [ ] 6.4 Create camera_providers.dart
+  - [x] 6.4 Create camera_providers.dart
     - Create `lib/presentation/providers/camera/camera_providers.dart` with cameraDataSourceProvider, cameraRepositoryProvider, and cameraDevicesProvider
     - cameraDevicesProvider filters devices from existing devicesControllerProvider to only camera-type devices
     - _Requirements: 11.1, 11.2, 11.7_
