@@ -12,17 +12,17 @@ Implements the camera gallery feature following clean architecture (domain → i
     - All fields are final, constructor uses required named params
     - _Requirements: 1.1_
 
-  - [-] 1.2 Create BatchDeleteResult entity
+  - [x] 1.2 Create BatchDeleteResult entity
     - Create `lib/domain/entities/batch_delete_result.dart` with `BatchDeleteResult` class containing deletedCount (int) and notFoundIds (List<String>)
     - _Requirements: 2.1_
 
-  - [~] 1.3 Create CameraRepository abstract class
+  - [x] 1.3 Create CameraRepository abstract class
     - Create `lib/domain/repositories/camera_repository.dart` defining the abstract `CameraRepository` contract with methods: getPhotos, getPhotoMetadata, getPhotoDownloadUrl, capturePhoto, deletePhoto, deletePhotos, getStreamUrl
     - Import `Photo`, `BatchDeleteResult`, and the existing `PaginatedResponse` generic
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
 
-- [ ] 2. Infrastructure layer — DTOs
-  - [ ] 2.1 Create PhotoDto with fromJson/toJson and toEntity
+- [x] 2. Infrastructure layer — DTOs
+  - [x] 2.1 Create PhotoDto with fromJson/toJson and toEntity
     - Create `lib/infrastructure/models/photo_dto.dart` with manual JSON serialization mapping snake_case backend keys to camelCase Dart fields
     - Store capturedAt and createdAt as String in the DTO, parse to DateTime in `toEntity()`
     - _Requirements: 1.2, 1.3, 1.4, 1.5, 1.6_
@@ -32,7 +32,7 @@ Implements the camera gallery feature following clean architecture (domain → i
     - **Property 2: PhotoDto rejects invalid JSON** — Missing/wrong-type fields cause errors
     - **Validates: Requirements 1.5, 1.6**
 
-  - [ ] 2.3 Create BatchDeleteResultDto with fromJson and toEntity
+  - [x] 2.3 Create BatchDeleteResultDto with fromJson and toEntity
     - Create `lib/infrastructure/models/batch_delete_result_dto.dart` with manual fromJson parsing `deleted_count` and `not_found_ids`, and `toEntity()` mapping
     - Throw `FormatException` on missing or incorrectly typed fields
     - _Requirements: 2.2, 2.3, 2.4_
