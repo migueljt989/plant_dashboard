@@ -6,17 +6,17 @@ Implements the camera gallery feature following clean architecture (domain → i
 
 ## Tasks
 
-- [ ] 1. Domain layer — entities and repository contract
-  - [ ] 1.1 Create Photo entity
+- [x] 1. Domain layer — entities and repository contract
+  - [x] 1.1 Create Photo entity
     - Create `lib/domain/entities/photo.dart` with the `Photo` class containing all fields: id, deviceId, filename, filepath, sizeBytes, contentType, capturedAt, createdAt
     - All fields are final, constructor uses required named params
     - _Requirements: 1.1_
 
-  - [ ] 1.2 Create BatchDeleteResult entity
+  - [-] 1.2 Create BatchDeleteResult entity
     - Create `lib/domain/entities/batch_delete_result.dart` with `BatchDeleteResult` class containing deletedCount (int) and notFoundIds (List<String>)
     - _Requirements: 2.1_
 
-  - [ ] 1.3 Create CameraRepository abstract class
+  - [~] 1.3 Create CameraRepository abstract class
     - Create `lib/domain/repositories/camera_repository.dart` defining the abstract `CameraRepository` contract with methods: getPhotos, getPhotoMetadata, getPhotoDownloadUrl, capturePhoto, deletePhoto, deletePhotos, getStreamUrl
     - Import `Photo`, `BatchDeleteResult`, and the existing `PaginatedResponse` generic
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7_
