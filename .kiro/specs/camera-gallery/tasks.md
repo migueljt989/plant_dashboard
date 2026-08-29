@@ -59,8 +59,8 @@ Implements the camera gallery feature following clean architecture (domain → i
     - **Property 5: URL construction correctness** — For any non-empty photoId/deviceId, getPhotoDownloadUrl ends with `/cameras/photos/{photoId}/file` and getStreamUrl ends with `/cameras/{deviceId}/stream`
     - **Validates: Requirements 3.10, 3.14, 10.2**
 
-- [ ] 4. Infrastructure layer — Repository implementation
-  - [ ] 4.1 Implement CameraRepositoryImpl
+- [x] 4. Infrastructure layer — Repository implementation
+  - [x] 4.1 Implement CameraRepositoryImpl
     - Create `lib/infrastructure/repositories/camera_repository_impl.dart` implementing `CameraRepository`
     - Receive `CameraDataSource` via constructor, delegate all calls, map DTOs to entities via `toEntity()`
     - Pass through URL strings directly, propagate failures without wrapping
