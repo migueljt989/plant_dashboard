@@ -66,7 +66,7 @@ Implements the camera gallery feature following clean architecture (domain → i
     - Pass through URL strings directly, propagate failures without wrapping
     - _Requirements: 4.8, 4.9, 4.10_
 
-- [ ] 5. Checkpoint — Domain and infrastructure layers complete
+- [x] 5. Checkpoint — Domain and infrastructure layers complete
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 6. Presentation layer — Providers and state models
