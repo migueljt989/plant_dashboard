@@ -42,12 +42,12 @@ Implements the camera gallery feature following clean architecture (domain → i
     - **Property 4: BatchDeleteResultDto rejects invalid JSON** — Missing/wrong-type fields throw FormatException
     - **Validates: Requirements 2.2, 2.3, 2.4**
 
-- [ ] 3. Infrastructure layer — DataSource contract and backend implementation
-  - [ ] 3.1 Create CameraDataSource abstract class
+- [x] 3. Infrastructure layer — DataSource contract and backend implementation
+  - [x] 3.1 Create CameraDataSource abstract class
     - Create `lib/infrastructure/datasources/camera/camera_datasource.dart` with the abstract contract defining all methods matching the design interface
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7_
 
-  - [ ] 3.2 Implement CameraDataSourceBackend
+  - [x] 3.2 Implement CameraDataSourceBackend
     - Create `lib/infrastructure/datasources/camera/camera_datasource_backend.dart` implementing `CameraDataSource` using authenticated Dio
     - Implement fetchPhotos (GET `/cameras/photos` with query params), fetchPhotoMetadata (GET `/cameras/photos/{id}`), capturePhoto (POST `/cameras/{device_id}/capture`), deletePhoto (DELETE `/cameras/photos/{id}`), deletePhotos (DELETE `/cameras/photos` with body)
     - Implement getPhotoDownloadUrl and getStreamUrl as URL construction without network calls
