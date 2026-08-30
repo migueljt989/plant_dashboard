@@ -125,7 +125,7 @@ Implements the camera gallery feature following clean architecture (domain → i
     - **Property 7: File size formatting** — For any non-negative sizeBytes, output ends in "KB" when < 1,048,576 or "MB" otherwise, with correct calculation
     - **Validates: Requirements 6.2**
 
-- [ ] 9. Checkpoint — Providers and controllers complete
+- [x] 9. Checkpoint — Providers and controllers complete
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Presentation layer — Pages
