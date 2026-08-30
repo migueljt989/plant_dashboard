@@ -116,8 +116,8 @@ Implements the camera gallery feature following clean architecture (domain → i
     - Implement `deletePhoto()` returning success indicator for navigation
     - _Requirements: 11.5, 11.6_
 
-- [ ] 8. Presentation layer — Utility helpers
-  - [ ] 8.1 Create file size formatter utility
+- [x] 8. Presentation layer — Utility helpers
+  - [x] 8.1 Create file size formatter utility
     - Create `lib/core/utils/file_size_formatter.dart` with a function that formats sizeBytes to human-readable: KB when < 1,048,576, MB otherwise, rounded to 1 decimal
     - _Requirements: 6.2_
 
