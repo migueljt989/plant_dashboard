@@ -99,11 +99,11 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - Propagates failures (NetworkFailure, NotFoundFailure, SessionExpiredFailure) without wrapping
     - _Requirements: 5.5, 5.6, 5.7_
 
-- [ ] 5. Checkpoint — Domain and infrastructure layers complete
+- [x] 5. Checkpoint — Domain and infrastructure layers complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Presentation layer — State model and providers
-  - [ ] 6.1 Create IrrigationState model
+- [x] 6. Presentation layer — State model and providers
+  - [x] 6.1 Create IrrigationState model
     - Create `lib/presentation/providers/irrigation/irrigation_state.dart`
     - Immutable class with fields: status (IrrigationStatus), lastCommandResponse (IrrigationCommandResponse?), history (List<IrrigationSession>), hasMore (bool), consecutiveFailures (int, default 0), isCommandInProgress (bool, default false)
     - Computed getter `isStale => consecutiveFailures >= 3`
@@ -114,7 +114,7 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - **Property 6: Consecutive failure count determines staleness**
     - **Validates: Requirements 9.6**
 
-  - [ ] 6.3 Create irrigation providers (datasource, repository, device)
+  - [x] 6.3 Create irrigation providers (datasource, repository, device)
     - Create `lib/presentation/providers/irrigation/irrigation_providers.dart`
     - `irrigationDataSourceProvider`: Provider returning IrrigationDataSourceBackend with authenticatedDioProvider
     - `irrigationRepositoryProvider`: Provider returning IrrigationRepositoryImpl with datasource
