@@ -6,24 +6,24 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
 
 ## Tasks
 
-- [ ] 1. Domain layer — Entities and repository contract
-  - [ ] 1.1 Create IrrigationSession entity
+- [x] 1. Domain layer — Entities and repository contract
+  - [x] 1.1 Create IrrigationSession entity
     - Create `lib/domain/entities/irrigation_session.dart`
     - Immutable class with fields: id (String), deviceId (String), startedAt (DateTime), endedAt (DateTime?), durationSeconds (int?), stopReason (String?)
     - Constructor with required/optional named parameters
     - _Requirements: 1.1_
 
-  - [ ] 1.2 Create IrrigationStatus entity
+  - [x] 1.2 Create IrrigationStatus entity
     - Create `lib/domain/entities/irrigation_status.dart`
     - Immutable class with fields: connected (bool), irrigating (bool), sessionStartedAt (DateTime?)
     - _Requirements: 2.1_
 
-  - [ ] 1.3 Create IrrigationCommandResponse entity
+  - [x] 1.3 Create IrrigationCommandResponse entity
     - Create `lib/domain/entities/irrigation_command_response.dart`
     - Immutable class with fields: status (String — "started"|"stopped"), cameraDeviceId (String?), cameraStreamingAvailable (bool)
     - _Requirements: 3.1_
 
-  - [ ] 1.4 Create IrrigationRepository abstract contract
+  - [x] 1.4 Create IrrigationRepository abstract contract
     - Create `lib/domain/repositories/irrigation_repository.dart`
     - Define methods: startIrrigation(String deviceId), stopIrrigation(String deviceId), getStatus(String deviceId), getHistory(String deviceId, {int limit, int offset})
     - Return types use domain entities and existing PaginatedResponse generic
