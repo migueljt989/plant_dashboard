@@ -39,4 +39,9 @@ const kNavItems = [
     icon: Icons.notifications_outlined,
     route: AppRoutes.alerts,
   ),
+  NavItem(
+    label: 'Cámaras',
+    icon: Icons.photo_camera_outlined,
+    route: AppRoutes.cameras,
+  ),
 ];

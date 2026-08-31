@@ -159,21 +159,21 @@ Implements the camera gallery feature following clean architecture (domain → i
     - Back navigation control
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.7_
 
-- [ ] 11. Router integration and navigation
-  - [ ] 11.1 Add route constants to AppRoutes
+- [x] 11. Router integration and navigation
+  - [x] 11.1 Add route constants to AppRoutes
     - Add `cameras`, `cameraPhoto`, and `cameraStream` constants to `lib/presentation/router/app_routes.dart`
     - _Requirements: 12.6_
 
-  - [ ] 11.2 Register camera routes in app_router.dart
+  - [x] 11.2 Register camera routes in app_router.dart
     - Add `/camaras`, `/camaras/foto/:id`, and `/camaras/stream/:deviceId` as children of the existing ShellRoute in `lib/presentation/router/app_router.dart`
     - Ensure auth guard applies (unauthenticated users redirect to login)
     - _Requirements: 12.1, 12.2, 12.3, 12.5_
 
-  - [ ] 11.3 Add "Cámaras" entry to side navigation menu
+  - [x] 11.3 Add "Cámaras" entry to side navigation menu
     - Add navigation item to the `kNavItems` list pointing to `/camaras`
     - _Requirements: 12.4_
 
-- [ ] 12. Final checkpoint — Full feature integration
+- [x] 12. Final checkpoint — Full feature integration
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

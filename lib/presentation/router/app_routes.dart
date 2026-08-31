@@ -29,4 +29,13 @@ class AppRoutes {
 
   /// Alertas del sistema.
   static const alerts = '/alertas';
+
+  /// Galería de cámaras (listado de fotos y streams).
+  static const cameras = '/camaras';
+
+  /// Detalle de una foto de cámara. Parámetro de ruta: `id`.
+  static const cameraPhoto = '/camaras/foto/:id';
+
+  /// Stream en vivo de una cámara. Parámetro de ruta: `deviceId`.
+  static const cameraStream = '/camaras/stream/:deviceId';
 }

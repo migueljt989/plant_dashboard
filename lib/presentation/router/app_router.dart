@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../pages/alerts/alerts_page.dart';
 import '../pages/auth/login_page.dart';
 import '../pages/auth/register_page.dart';
+import '../pages/camera/live_stream_page.dart';
+import '../pages/camera/photo_gallery_page.dart';
+import '../pages/camera/photo_viewer_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
 import '../pages/devices/devices_page.dart';
 import '../pages/readings/readings_page.dart';
@@ -102,6 +105,24 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.alerts,
             builder: (context, state) => const AlertsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.cameras,
+            builder: (context, state) => const PhotoGalleryPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.cameraPhoto,
+            builder: (context, state) {
+              final String id = state.pathParameters['id']!;
+              return PhotoViewerPage(photoId: id);
+            },
+          ),
+          GoRoute(
+            path: AppRoutes.cameraStream,
+            builder: (context, state) {
+              final String deviceId = state.pathParameters['deviceId']!;
+              return LiveStreamPage(deviceId: deviceId);
+            },
           ),
         ],
       ),
