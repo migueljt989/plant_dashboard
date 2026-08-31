@@ -40,6 +40,11 @@ const kNavItems = [
     route: AppRoutes.alerts,
   ),
   NavItem(
+    label: 'Riego',
+    icon: Icons.water_drop_outlined,
+    route: AppRoutes.riego,
+  ),
+  NavItem(
     label: 'Cámaras',
     icon: Icons.photo_camera_outlined,
     route: AppRoutes.cameras,

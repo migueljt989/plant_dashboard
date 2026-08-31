@@ -194,8 +194,8 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - Composes: IrrigationStatusCard, IrrigationControls, CameraStreamLink, StaleDateBanner, IrrigationHistoryList
     - _Requirements: 6.5, 6.6, 6.8, 10.8_
 
-- [ ] 10. Route registration and navigation integration
-  - [ ] 10.1 Register /riego route and nav item
+- [x] 10. Route registration and navigation integration
+  - [x] 10.1 Register /riego route and nav item
     - Add `static const riego = '/riego';` to AppRoutes
     - Add GoRoute with path AppRoutes.riego as child of ShellRoute (after alerts), builder returns IrrigationPage
     - Add NavItem with label "Riego", water-drop outlined icon, route AppRoutes.riego, positioned after "Alertas" entry in kNavItems

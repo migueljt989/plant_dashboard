@@ -30,6 +30,9 @@ class AppRoutes {
   /// Alertas del sistema.
   static const alerts = '/alertas';
 
+  /// Control de riego.
+  static const riego = '/riego';
+
   /// Galería de cámaras (listado de fotos y streams).
   static const cameras = '/camaras';
 

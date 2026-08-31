@@ -9,6 +9,7 @@ import '../pages/camera/photo_gallery_page.dart';
 import '../pages/camera/photo_viewer_page.dart';
 import '../pages/dashboard/dashboard_page.dart';
 import '../pages/devices/devices_page.dart';
+import '../pages/irrigation/irrigation_page.dart';
 import '../pages/readings/readings_page.dart';
 import '../pages/sensors/sensors_page.dart';
 import '../pages/splash/splash_page.dart';
@@ -105,6 +106,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutes.alerts,
             builder: (context, state) => const AlertsPage(),
+          ),
+          GoRoute(
+            path: AppRoutes.riego,
+            builder: (context, state) => const IrrigationPage(),
           ),
           GoRoute(
             path: AppRoutes.cameras,
