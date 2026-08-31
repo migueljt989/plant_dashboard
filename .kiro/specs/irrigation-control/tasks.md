@@ -29,8 +29,8 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - Return types use domain entities and existing PaginatedResponse generic
     - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 2. Infrastructure layer — DTOs
-  - [ ] 2.1 Create IrrigationSessionDto with fromJson/toJson/toEntity
+- [x] 2. Infrastructure layer — DTOs
+  - [x] 2.1 Create IrrigationSessionDto with fromJson/toJson/toEntity
     - Create `lib/infrastructure/models/irrigation_session_dto.dart`
     - Manual JSON serialization mapping snake_case keys to camelCase fields
     - `fromJson` throws FormatException on missing required fields (id, device_id, started_at) or incorrect types
@@ -42,7 +42,7 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - **Property 1: IrrigationSessionDto round-trip serialization**
     - **Validates: Requirements 1.5**
 
-  - [ ] 2.3 Create IrrigationStatusDto with fromJson/toJson/toEntity
+  - [x] 2.3 Create IrrigationStatusDto with fromJson/toJson/toEntity
     - Create `lib/infrastructure/models/irrigation_status_dto.dart`
     - Manual JSON serialization mapping snake_case keys
     - `fromJson` throws FormatException on missing required fields (connected, irrigating) or incorrect types
@@ -54,7 +54,7 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - **Property 2: IrrigationStatusDto round-trip serialization**
     - **Validates: Requirements 2.5**
 
-  - [ ] 2.5 Create IrrigationCommandResponseDto with fromJson/toJson/toEntity
+  - [x] 2.5 Create IrrigationCommandResponseDto with fromJson/toJson/toEntity
     - Create `lib/infrastructure/models/irrigation_command_response_dto.dart`
     - Manual JSON serialization mapping snake_case keys
     - `fromJson` throws FormatException on missing required fields (status, camera_streaming_available) or incorrect types
