@@ -139,11 +139,11 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - **Property 7: Poll status transition updates controller state**
     - **Validates: Requirements 9.2**
 
-- [ ] 8. Checkpoint — Providers and controller complete
+- [x] 8. Checkpoint — Providers and controller complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Presentation layer — IrrigationPage and widgets
-  - [ ] 9.1 Create IrrigationStatusCard widget
+- [x] 9. Presentation layer — IrrigationPage and widgets
+  - [x] 9.1 Create IrrigationStatusCard widget
     - Create `lib/presentation/pages/irrigation/widgets/irrigation_status_card.dart`
     - Green dot when connected, red dot when disconnected
     - Animated pulsing water-drop icon when irrigating
@@ -152,7 +152,7 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - "Dispositivo desconectado" text when disconnected
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.7_
 
-  - [ ] 9.2 Create IrrigationControls widget
+  - [x] 9.2 Create IrrigationControls widget
     - Create `lib/presentation/pages/irrigation/widgets/irrigation_controls.dart`
     - "Iniciar Riego" button when connected and not irrigating
     - "Detener Riego" button when connected and irrigating
@@ -162,7 +162,7 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - Error SnackBar on command failure (visible up to 8 seconds)
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 7.10_
 
-  - [ ] 9.3 Create CameraStreamLink widget
+  - [x] 9.3 Create CameraStreamLink widget
     - Create `lib/presentation/pages/irrigation/widgets/camera_stream_link.dart`
     - "Ver Cámara en Vivo" button visible only when irrigating + cameraStreamingAvailable + cameraDeviceId non-null
     - Navigates to `/camaras/stream/:cameraDeviceId` on tap
@@ -170,7 +170,7 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - Persists if navigating back and still irrigating (uses stored cameraDeviceId from state)
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5_
 
-  - [ ] 9.4 Create IrrigationHistoryList widget
+  - [x] 9.4 Create IrrigationHistoryList widget
     - Create `lib/presentation/pages/irrigation/widgets/irrigation_history_list.dart`
     - Display sessions in reverse chronological order
     - Each session shows: start time "dd/MM/yyyy HH:mm", end time or "En progreso", duration "Xm Ys" or "—", stop reason if non-null
@@ -180,13 +180,13 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - Empty state message when no sessions exist
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7_
 
-  - [ ] 9.5 Create StaleDateBanner widget
+  - [x] 9.5 Create StaleDateBanner widget
     - Create `lib/presentation/pages/irrigation/widgets/stale_data_banner.dart`
     - Visible when state.isStale (consecutiveFailures >= 3)
     - Displays warning that data may be outdated
     - _Requirements: 9.6_
 
-  - [ ] 9.6 Create IrrigationPage (main composition)
+  - [x] 9.6 Create IrrigationPage (main composition)
     - Create `lib/presentation/pages/irrigation/irrigation_page.dart`
     - ConsumerWidget that watches irrigationControllerProvider
     - Handles AsyncValue states: loading (CircularProgressIndicator), error (full-page error with retry), data (compose sub-widgets)
