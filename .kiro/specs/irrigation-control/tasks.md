@@ -70,14 +70,14 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - **Property 4: Invalid JSON rejection**
     - **Validates: Requirements 1.6, 2.6, 3.6**
 
-- [ ] 3. Infrastructure layer — DataSource contract and backend implementation
-  - [ ] 3.1 Create IrrigationDataSource abstract contract
+- [x] 3. Infrastructure layer — DataSource contract and backend implementation
+  - [x] 3.1 Create IrrigationDataSource abstract contract
     - Create `lib/infrastructure/datasources/irrigation/irrigation_datasource.dart`
     - Define methods: startIrrigation(String deviceId), stopIrrigation(String deviceId), fetchStatus(String deviceId), fetchHistory(String deviceId, {required int limit, required int offset})
     - Return types are DTOs and PaginatedResponse<IrrigationSessionDto>
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ] 3.2 Create IrrigationDataSourceBackend implementation
+  - [x] 3.2 Create IrrigationDataSourceBackend implementation
     - Create `lib/infrastructure/datasources/irrigation/irrigation_datasource_backend.dart`
     - Receives authenticated Dio instance via constructor
     - Validates deviceId non-empty (throws ArgumentError)
