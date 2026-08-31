@@ -128,8 +128,8 @@ Implements the camera gallery feature following clean architecture (domain → i
 - [x] 9. Checkpoint — Providers and controllers complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Presentation layer — Pages
-  - [ ] 10.1 Implement PhotoGalleryPage
+- [x] 10. Presentation layer — Pages
+  - [x] 10.1 Implement PhotoGalleryPage
     - Create `lib/presentation/pages/camera/photo_gallery_page.dart`
     - Responsive grid: 2 cols < 600px, 3 cols 600–1024px, 4 cols > 1024px
     - Filter controls: camera dropdown (from cameraDevicesProvider) and date range pickers
@@ -141,7 +141,7 @@ Implements the camera gallery feature following clean architecture (domain → i
     - Navigation to PhotoViewerPage on tap, navigation links to LiveStreamPage per camera device
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 5.11, 7.1, 7.2, 7.4, 7.6, 7.7, 7.8, 8.1, 8.2, 8.4, 8.5, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.8, 9.9, 10.6_
 
-  - [ ] 10.2 Implement PhotoViewerPage
+  - [x] 10.2 Implement PhotoViewerPage
     - Create `lib/presentation/pages/camera/photo_viewer_page.dart`
     - Full-resolution photo loaded from getPhotoDownloadUrl
     - Metadata display: filename, device_id, captured_at, file size (using formatter)
@@ -150,7 +150,7 @@ Implements the camera gallery feature following clean architecture (domain → i
     - Back navigation control
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7_
 
-  - [ ] 10.3 Implement LiveStreamPage
+  - [x] 10.3 Implement LiveStreamPage
     - Create `lib/presentation/pages/camera/live_stream_page.dart`
     - MJPEG stream via HtmlElementView rendering an HTML `<img>` element
     - Stream URL from getStreamUrl with JWT token appended as `?token=` query param
