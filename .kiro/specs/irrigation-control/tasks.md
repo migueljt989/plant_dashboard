@@ -122,8 +122,8 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - `irrigationControllerProvider`: AsyncNotifierProvider.autoDispose declaration
     - _Requirements: 11.1, 11.2, 11.3, 11.4_
 
-- [ ] 7. Presentation layer — IrrigationController
-  - [ ] 7.1 Implement IrrigationController (autoDispose AsyncNotifier)
+- [x] 7. Presentation layer — IrrigationController
+  - [x] 7.1 Implement IrrigationController (autoDispose AsyncNotifier)
     - Create `lib/presentation/providers/irrigation/irrigation_controller.dart`
     - `build()`: read irrigationDeviceProvider, throw if null; Future.wait([getStatus, getHistory(limit:20, offset:0)]); start polling timer; start duration timer if irrigating
     - `ref.onDispose`: cancel poll timer and duration timer
