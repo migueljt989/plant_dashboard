@@ -16,6 +16,13 @@ class TokenInterceptor extends Interceptor {
   final AuthRemoteDataSource _authDataSource;
   final void Function() _onSessionExpired;
 
+  /// Fábrica que crea un Dio "limpio" (sin este interceptor) para reintentar la
+  /// petición original tras un refresh exitoso. Debe traer la misma `baseUrl` y
+  /// los mismos timeouts que el Dio autenticado; de lo contrario el retry
+  /// apunta a una URL relativa sin host y en Flutter Web se queda colgado hasta
+  /// el timeout por defecto del navegador (~1 min).
+  final Dio Function() _retryDioFactory;
+
   Completer<String>? _refreshCompleter;
 
   /// Paths de auth que NO deben disparar un refresh al recibir 401.
@@ -29,6 +36,7 @@ class TokenInterceptor extends Interceptor {
     required this._localStorage,
     required this._authDataSource,
     required this._onSessionExpired,
+    required this._retryDioFactory,
   });
 
   @override
@@ -62,9 +70,9 @@ class TokenInterceptor extends Interceptor {
       final opts = err.requestOptions;
       opts.headers['Authorization'] = 'Bearer $newToken';
 
-      // Usa un Dio limpio para el retry y evitar loop infinito
-      // (este interceptor vive en el Dio autenticado).
-      final response = await Dio().fetch(opts);
+      // Usa un Dio limpio (con baseUrl y timeouts, pero SIN este interceptor)
+      // para el retry, evitando un loop infinito de refresh.
+      final response = await _retryDioFactory().fetch(opts);
       return handler.resolve(response);
     } catch (_) {
       _onSessionExpired();

@@ -280,13 +280,21 @@ final irrigationRepositoryProvider = Provider<IrrigationRepository>((ref) {
   return IrrigationRepositoryImpl(ref.watch(irrigationDataSourceProvider));
 });
 
-/// Exposes the first device with type DeviceType.irrigation, or null.
-final irrigationDeviceProvider = Provider<Device?>((ref) {
-  final devicesAsync = ref.watch(devicesControllerProvider);
-  return devicesAsync.valueOrNull?.cast<Device?>().firstWhere(
-        (d) => d!.type == DeviceType.irrigation,
-        orElse: () => null,
-      );
+/// Exposes the first device with type DeviceType.irrigation, or null when the
+/// list loaded successfully and contains none.
+///
+/// It is a FutureProvider on purpose. A synchronous `Provider<Device?>` reading
+/// `valueOrNull` would collapse three distinct situations into a single null —
+/// list still loading, list failed, and list loaded without an irrigation
+/// device — which surfaces network and 401 failures to the user as "no device
+/// registered". Awaiting the list keeps loading as loading and lets real errors
+/// propagate unchanged.
+final irrigationDeviceProvider = FutureProvider<Device?>((ref) async {
+  final devices = await ref.watch(devicesControllerProvider.future);
+  for (final device in devices) {
+    if (device.type == DeviceType.irrigation) return device;
+  }
+  return null;
 });
 
 final irrigationControllerProvider =
@@ -303,8 +311,15 @@ class IrrigationController extends AutoDisposeAsyncNotifier<IrrigationState> {
 
   @override
   Future<IrrigationState> build() async {
-    final device = ref.read(irrigationDeviceProvider);
-    if (device == null) throw Exception('No irrigation device available');
+    // `watch(...future)` and not `read`: this awaits the device list instead of
+    // reading a synchronous null, and rebuilds if the list changes.
+    final device = await ref.watch(irrigationDeviceProvider.future);
+
+    // Defensive guard only. IrrigationPage resolves the device first and builds
+    // this controller only when one exists, so this is unreachable in practice.
+    // Never rely on throwing here to signal an absent device — see the loop
+    // warning below.
+    if (device == null) throw const NoIrrigationDeviceException();
 
     ref.onDispose(() {
       _pollTimer?.cancel();
@@ -338,6 +353,43 @@ class IrrigationController extends AutoDisposeAsyncNotifier<IrrigationState> {
   Future<void> loadMoreHistory() async { /* paginate append */ }
 }
 ```
+
+#### ⚠️ Never throw from an autoDispose `build()` to signal a routine state
+
+An `autoDispose` provider does **not** retain the error state produced by a
+throwing `build()`. It is disposed, the page's still-active listener immediately
+recreates it, `build()` throws again, and the cycle repeats. The result is an
+infinite rebuild loop that saturates the main isolate. It produces no error and
+no stack trace — the only visible symptom is a UI stuck on a loading indicator,
+which is easily mistaken for a slow network.
+
+`irrigationControllerProvider` is `autoDispose`, so the absence of a device must
+be handled **before** the controller is built, not by throwing inside it:
+
+```dart
+class IrrigationPage extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Resolve the device FIRST. The controller is only watched once a device
+    // is confirmed, so "no device" never reaches a throwing build().
+    final deviceAsync = ref.watch(irrigationDeviceProvider);
+
+    return deviceAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      // Real failure (network, 401) → error UI with retry.
+      error: (error, _) => _IrrigationError(error: error),
+      // Expected, non-error state → informational message, no controller built.
+      data: (device) => device == null
+          ? const _NoDeviceMessage()
+          : const _IrrigationContent(), // this one watches the controller
+    );
+  }
+}
+```
+
+General rule: an expected, routine condition (an empty list, an absent optional
+resource) belongs in the state, not in an error channel. Modeling it as an error
+is what triggers the loop.
 
 #### Page & Widgets
 

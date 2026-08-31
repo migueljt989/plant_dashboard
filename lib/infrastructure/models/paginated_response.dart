@@ -17,7 +17,12 @@ class PaginatedResponse<T> {
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) itemParser,
   ) {
-    final pagination = json['pagination'] as Map<String, dynamic>;
+    // El backend es inconsistente en cómo expone los metadatos de paginación:
+    // algunos endpoints (readings, alerts) los anidan bajo la clave
+    // `pagination`, mientras que otros (irrigation history, cameras photos) los
+    // devuelven planos al nivel raíz. Soportamos ambos formatos: si existe el
+    // objeto `pagination` se leen de ahí, si no, se leen del nivel raíz.
+    final pagination = json['pagination'] as Map<String, dynamic>? ?? json;
     final itemsList = json['items'] as List<dynamic>;
     return PaginatedResponse(
       items: itemsList

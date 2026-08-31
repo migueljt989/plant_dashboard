@@ -304,13 +304,20 @@ class TokenInterceptor extends Interceptor {
 
   Completer<String>? _refreshCompleter;
 
+  /// Builds a clean Dio (without this interceptor) to retry the original
+  /// request. It MUST carry the same baseUrl and timeouts as the authenticated
+  /// Dio — see the warning below the class.
+  final Dio Function() _retryDioFactory;
+
   TokenInterceptor({
     required LocalAuthDataSource localStorage,
     required AuthRemoteDataSource authDataSource,
     required void Function() onSessionExpired,
+    required Dio Function() retryDioFactory,
   })  : _localStorage = localStorage,
         _authDataSource = authDataSource,
-        _onSessionExpired = onSessionExpired;
+        _onSessionExpired = onSessionExpired,
+        _retryDioFactory = retryDioFactory;
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
@@ -335,10 +342,13 @@ class TokenInterceptor extends Interceptor {
 
     try {
       final newToken = await _getRefreshedToken();
-      // Retry original request with new token
+      // Retry original request with new token.
       final opts = err.requestOptions;
       opts.headers['Authorization'] = 'Bearer $newToken';
-      final response = await Dio().fetch(opts);
+      // NOT `Dio()`: a bare instance has no baseUrl, and opts.path is relative
+      // ('/devices'), so the retry would target a hostless URL. Use the factory,
+      // which carries the same baseUrl and timeouts but not this interceptor.
+      final response = await _retryDioFactory().fetch(opts);
       return handler.resolve(response);
     } catch (_) {
       _onSessionExpired();
@@ -383,16 +393,31 @@ import '../datasources/auth/local_auth_datasource.dart';
 import '../datasources/auth/auth_remote_datasource.dart';
 import 'token_interceptor.dart';
 
+const _baseUrl = 'http://127.0.0.1:8000';
+
+/// Base options shared by EVERY Dio instance. Centralized on purpose so the
+/// interceptor's retry cannot drift from the authenticated Dio's configuration.
+///
+/// Timeouts are mandatory: without connectTimeout, an unreachable or silent
+/// backend leaves requests hanging until the platform default (roughly a minute
+/// on Flutter Web) instead of failing in seconds.
+BaseOptions _baseOptions() => BaseOptions(
+      baseUrl: _baseUrl,
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 10),
+      sendTimeout: const Duration(seconds: 10),
+    );
+
+Dio _buildDio() => Dio(_baseOptions());
+
 /// Base Dio instance WITHOUT interceptor — used by AuthRemoteDataSource
 /// to avoid circular dependency during token refresh.
-final baseDioProvider = Provider<Dio>((ref) {
-  return Dio(BaseOptions(baseUrl: 'http://127.0.0.1:8000'));
-});
+final baseDioProvider = Provider<Dio>((ref) => _buildDio());
 
 /// Dio instance WITH token interceptor — used by all other datasources
 /// (sensors, devices, readings, alerts).
 final authenticatedDioProvider = Provider<Dio>((ref) {
-  final dio = Dio(BaseOptions(baseUrl: 'http://127.0.0.1:8000'));
+  final dio = _buildDio();
   final localStorage = ref.watch(authLocalDataSourceProvider);
   final authDataSource = ref.watch(authDataSourceProvider);
 
@@ -403,6 +428,8 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
       // Trigger logout through the auth controller
       ref.read(authControllerProvider.notifier).logout();
     },
+    // Same baseUrl and timeouts, without the interceptor (no refresh re-entry).
+    retryDioFactory: _buildDio,
   ));
 
   return dio;
@@ -410,6 +437,13 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
 ```
 
 **Key design decision:** Two Dio instances to avoid circular refresh. `baseDio` is plain (no interceptor), used only by the auth datasource. `authenticatedDio` has the interceptor and is used by all other feature datasources (sensors, readings, etc.).
+
+**⚠️ The retry needs a configured Dio, not a bare one.** The interceptor must not
+retry with `Dio()`. A bare instance has no `baseUrl`, and `RequestOptions.path`
+is relative (`/devices`), so the retry targets a hostless URL. On Flutter Web
+this does not fail loudly — the request simply hangs, so every authenticated
+request appears to return 401 forever while the UI just looks slow. Inject a
+factory that reuses `_baseOptions()` and omits only the interceptor.
 
 ---
 

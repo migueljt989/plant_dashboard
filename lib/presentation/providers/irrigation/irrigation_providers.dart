@@ -24,15 +24,19 @@ final irrigationRepositoryProvider = Provider<IrrigationRepository>((ref) {
   return IrrigationRepositoryImpl(ref.watch(irrigationDataSourceProvider));
 });
 
-/// Expone el primer dispositivo cuyo tipo es [DeviceType.irrigation], o null si
-/// no existe ningún dispositivo de riego registrado.
+/// Expone el primer dispositivo cuyo tipo es [DeviceType.irrigation], o `null`
+/// si la lista cargó correctamente pero no hay ninguno registrado.
 ///
-/// Deriva la selección del controlador de dispositivos existente. Mientras la
-/// lista de dispositivos aún no cargó (o falló), devuelve null.
-final irrigationDeviceProvider = Provider<Device?>((ref) {
-  final devicesAsync = ref.watch(devicesControllerProvider);
-  final devices = devicesAsync.value;
-  if (devices == null) return null;
+/// Es un [FutureProvider] (y no un `Provider` síncrono) a propósito: así se
+/// distinguen tres situaciones que antes se colapsaban todas en `null`:
+/// - lista aún cargando  → este provider sigue en `loading`
+/// - lista falló (red/401) → el error se propaga tal cual
+/// - lista OK sin riego   → devuelve `null`
+///
+/// Colapsarlas hacía que un fallo de red o una carga en curso se mostraran en
+/// la UI como "no hay dispositivo de riego registrado", que es engañoso.
+final irrigationDeviceProvider = FutureProvider<Device?>((ref) async {
+  final devices = await ref.watch(devicesControllerProvider.future);
   for (final device in devices) {
     if (device.type == DeviceType.irrigation) return device;
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../providers/device/device_providers.dart';
+import '../../providers/irrigation/irrigation_controller.dart';
 import '../../providers/irrigation/irrigation_providers.dart';
 import '../../providers/irrigation/irrigation_state.dart';
 import 'widgets/camera_stream_link.dart';
@@ -35,14 +37,41 @@ class IrrigationPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Se resuelve PRIMERO el dispositivo de riego y solo se observa el
+    // controller cuando existe uno.
+    //
+    // Esto es deliberado: `irrigationControllerProvider` es `autoDispose`, y un
+    // provider autoDispose cuyo `build()` lanza no retiene el estado de error —
+    // se descarta y el listener de la página lo vuelve a crear de inmediato,
+    // entrando en un bucle de reconstrucciones que bloquea el isolate y deja el
+    // spinner colgado. Al no construir el controller cuando no hay dispositivo,
+    // el caso "sin dispositivo" deja de ser un error y el bucle no existe.
+    final deviceAsync = ref.watch(irrigationDeviceProvider);
+
+    return deviceAsync.when(
+      // Requirement 6.5: indicador de carga centrado.
+      loading: () => const Center(child: CircularProgressIndicator()),
+      // Requirement 6.6: fallo real al obtener los dispositivos (red, 401...).
+      error: (error, _) => _IrrigationError(error: error),
+      // Requirement 6.8: la lista cargó pero no hay dispositivo de riego.
+      data: (device) =>
+          device == null ? const _NoDeviceMessage() : const _IrrigationContent(),
+    );
+  }
+}
+
+/// Contenido de la página cuando ya se confirmó que existe un dispositivo de
+/// riego. Solo aquí se observa el `irrigationControllerProvider`.
+class _IrrigationContent extends ConsumerWidget {
+  const _IrrigationContent();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final asyncState = ref.watch(irrigationControllerProvider);
 
     return asyncState.when(
-      // Requirement 6.5: indicador de carga centrado.
       loading: () => const Center(child: CircularProgressIndicator()),
-      // Requirements 6.6 / 6.8: estado de error (o "sin dispositivo").
       error: (error, _) => _IrrigationError(error: error),
-      // Composición de la vista de datos.
       data: (state) => _IrrigationDataView(state: state),
     );
   }
@@ -103,10 +132,12 @@ class _IrrigationError extends ConsumerWidget {
   final Object error;
 
   /// Determina si el error corresponde a la ausencia de un dispositivo de riego
-  /// registrado (Requirement 6.8). El controller lanza un `Exception` con este
-  /// texto cuando `irrigationDeviceProvider` devuelve null.
-  bool get _isNoDevice =>
-      error.toString().toLowerCase().contains('dispositivo de riego');
+  /// registrado (Requirement 6.8).
+  ///
+  /// Se comprueba por tipo y no por el texto del error: un fallo de red o un
+  /// 401 ya no se confunden con "no hay dispositivo", que era lo que hacía la
+  /// comparación de strings anterior.
+  bool get _isNoDevice => error is NoIrrigationDeviceException;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -153,7 +184,12 @@ class _IrrigationError extends ConsumerWidget {
             FilledButton.icon(
               icon: const Icon(Icons.refresh),
               label: const Text('Reintentar'),
-              onPressed: () => ref.invalidate(irrigationControllerProvider),
+              // Se invalida también la lista de dispositivos: si el fallo fue al
+              // obtenerla, reintentar solo el controller no volvería a pedirla.
+              onPressed: () {
+                ref.invalidate(devicesControllerProvider);
+                ref.invalidate(irrigationControllerProvider);
+              },
             ),
           ],
         ),

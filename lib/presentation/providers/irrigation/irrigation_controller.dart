@@ -19,6 +19,20 @@ const _durationTickInterval = Duration(seconds: 1);
 /// Cantidad de items por página del historial (Requirements 10.3, 11.8).
 const _historyPageSize = 20;
 
+/// Error emitido cuando la lista de dispositivos cargó correctamente pero no
+/// contiene ningún dispositivo de tipo riego (Requirement 6.8 / 11.6).
+///
+/// Es un tipo propio (y no un `Exception` genérico con un mensaje) para que la
+/// UI pueda distinguir este caso con `is NoIrrigationDeviceException` en lugar
+/// de inspeccionar el texto del error, que se rompe con cualquier cambio de
+/// redacción o de idioma.
+class NoIrrigationDeviceException implements Exception {
+  const NoIrrigationDeviceException();
+
+  @override
+  String toString() => 'No hay ningún dispositivo de riego registrado';
+}
+
 /// Controlador del feature de riego.
 ///
 /// Es `autoDispose`: al salir de la página se cancelan los timers de polling y
@@ -37,10 +51,19 @@ class IrrigationController extends AsyncNotifier<IrrigationState> {
 
   @override
   Future<IrrigationState> build() async {
-    // Requirement 11.6: si no hay dispositivo de riego, emitir estado de error.
-    final device = ref.read(irrigationDeviceProvider);
+    // Se usa `watch(...future)` y no `read`: así este controller espera de
+    // verdad a que la lista de dispositivos cargue (en vez de interpretar
+    // "todavía cargando" como "no hay dispositivo") y se reconstruye si la
+    // lista cambia. Si la carga falla, el error se propaga y la UI muestra el
+    // estado de error con reintento, no el mensaje de "sin dispositivo".
+    final device = await ref.watch(irrigationDeviceProvider.future);
+
+    // Guarda defensiva (Requirement 11.6). En la práctica es inalcanzable:
+    // `IrrigationPage` solo construye este controller cuando ya confirmó que
+    // hay un dispositivo de riego, precisamente para no lanzar desde el `build`
+    // de un provider autoDispose.
     if (device == null) {
-      throw Exception('No hay dispositivo de riego disponible');
+      throw const NoIrrigationDeviceException();
     }
     _deviceId = device.id;
 
