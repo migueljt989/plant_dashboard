@@ -90,8 +90,8 @@ Implementación del feature de control de riego siguiendo la arquitectura Clean 
     - **Property 5: Invalid pagination parameters rejection**
     - **Validates: Requirements 4.11**
 
-- [ ] 4. Infrastructure layer — Repository implementation
-  - [ ] 4.1 Create IrrigationRepositoryImpl
+- [x] 4. Infrastructure layer — Repository implementation
+  - [x] 4.1 Create IrrigationRepositoryImpl
     - Create `lib/infrastructure/repositories/irrigation_repository_impl.dart`
     - Receives IrrigationDataSource via constructor
     - Delegates to datasource methods, maps DTOs to entities via `toEntity()`
