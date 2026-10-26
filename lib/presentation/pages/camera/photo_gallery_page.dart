@@ -5,10 +5,23 @@ import 'package:go_router/go_router.dart';
 import '../../../domain/entities/batch_delete_result.dart';
 import '../../../domain/entities/device.dart';
 import '../../../domain/entities/photo.dart';
+import '../../providers/auth/auth_local_datasource_provider.dart';
 import '../../providers/camera/camera_providers.dart';
 import '../../providers/camera/photo_gallery_controller.dart';
 import '../../providers/camera/photo_gallery_filter.dart';
 import '../../providers/camera/photo_gallery_state.dart';
+
+/// Construye la URL de descarga del thumbnail con el token adjunto como
+/// query param, igual que hace el visor de foto completa.
+final _thumbnailUrlProvider =
+    FutureProvider.autoDispose.family<String, String>((ref, photoId) async {
+  final baseUrl =
+      ref.watch(cameraRepositoryProvider).getPhotoDownloadUrl(photoId);
+  final token = await ref.watch(authLocalDataSourceProvider).readToken();
+  if (token == null || token.isEmpty) return baseUrl;
+  final separator = baseUrl.contains('?') ? '&' : '?';
+  return '$baseUrl${separator}token=$token';
+});
 
 /// Máximo de fotos que se pueden seleccionar para un borrado en lote.
 const int _maxBatchSelection = 50;
@@ -263,9 +276,6 @@ class _PhotoGalleryPageState extends ConsumerState<PhotoGalleryPage> {
                 final photo = state.items[index];
                 return _PhotoTile(
                   photo: photo,
-                  thumbnailUrl: ref
-                      .read(cameraRepositoryProvider)
-                      .getPhotoDownloadUrl(photo.id),
                   isSelectionMode: state.isSelectionMode,
                   isSelected: state.selectedIds.contains(photo.id),
                   onTap: () => _onPhotoTapped(state, photo),
@@ -581,10 +591,9 @@ class _CaptureButton extends StatelessWidget {
 // Miniatura individual de foto
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _PhotoTile extends StatelessWidget {
+class _PhotoTile extends ConsumerWidget {
   const _PhotoTile({
     required this.photo,
-    required this.thumbnailUrl,
     required this.isSelectionMode,
     required this.isSelected,
     required this.onTap,
@@ -592,15 +601,15 @@ class _PhotoTile extends StatelessWidget {
   });
 
   final Photo photo;
-  final String thumbnailUrl;
   final bool isSelectionMode;
   final bool isSelected;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final urlAsync = ref.watch(_thumbnailUrlProvider(photo.id));
 
     return InkWell(
       onTap: onTap,
@@ -624,24 +633,47 @@ class _PhotoTile extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  Image.network(
-                    thumbnailUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
-                      return const Center(
+                  urlAsync.when(
+                    loading: () => Container(
+                      color: colorScheme.surfaceContainerHighest,
+                      child: const Center(
                         child: SizedBox(
                           width: 24,
                           height: 24,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                      );
-                    },
-                    errorBuilder: (context, error, _) => Container(
+                      ),
+                    ),
+                    error: (_, __) => Container(
                       color: colorScheme.surfaceContainerHighest,
                       child: Icon(
                         Icons.broken_image_outlined,
                         color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    data: (url) => Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return Container(
+                          color: colorScheme.surfaceContainerHighest,
+                          child: const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, _) => Container(
+                        color: colorScheme.surfaceContainerHighest,
+                        child: Icon(
+                          Icons.broken_image_outlined,
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                   ),
